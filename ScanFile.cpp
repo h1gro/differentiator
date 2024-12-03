@@ -4,9 +4,9 @@
 
 #include "Differentiator.h"
 
-static const char* TREE_FILE = "Tree.txt";
+static const char* EXPR_FILE = "Expression.txt";
 
-size_t ScanFile(struct file_t* file_struct)
+size_t ScanFile(struct file_t* file_struct, struct expr_t* expr)
 {
     assert(file_struct->file_ptr);
 
@@ -14,16 +14,22 @@ size_t ScanFile(struct file_t* file_struct)
 
     if (CheckFile(file_struct->file_ptr) != -1)
     {
-        char* file_struct_buffer = BufferCtor(file_struct);
+        BufferCtor(file_struct, expr);
 
-        size_t number_elems = fread(file_struct_buffer, 1, file_struct->file_size, file_struct->file_ptr);
+        size_t number_elems = fread(expr->string, 1, file_struct->file_size, file_struct->file_ptr);
+
+        for (int i = 0; i < file_struct->file_size; i++)
+        {
+            printf("%c", expr->string[i]);
+        }
+        printf("\n");
 
         if (number_elems != file_struct->file_size)
         {
             printf("fread return = %lu, stat return = %lu\n", number_elems, file_struct->file_size);
         }
 
-        ChangeSymbolInBuffer(file_struct, file_struct->file_size, '\r', '\0');
+        ChangeSymbolInBuffer(expr->string, file_struct->file_size, '\r', '\0');
 
         return file_struct->file_size;
     }
@@ -34,7 +40,7 @@ size_t ScanFile(struct file_t* file_struct)
     }
 }
 
-char* BufferCtor(struct file_t* tree)
+void BufferCtor(struct file_t* tree, struct expr_t* expr)
 {
     assert(tree);
 
@@ -42,17 +48,13 @@ char* BufferCtor(struct file_t* tree)
 
     struct stat tree_file = {};
 
-    stat(TREE_FILE, &tree_file);
+    stat(EXPR_FILE, &tree_file);
 
-    tree->buffer = (char*) calloc(tree_file.st_size, sizeof(char));
+    //expr->string = (char*) calloc(tree_file.st_size, sizeof(char));
 
     tree->file_size = tree_file.st_size;
 
     printf("%lu\n", tree->file_size);
-
-    assert(tree->buffer);
-
-    return tree->buffer;
 }
 
 size_t SkipSpacesForPrint(struct file_t* tree, size_t index)

@@ -3,6 +3,13 @@
 
 #include <stdio.h>
 
+const int    EXPR_SIZE        = 1000;
+const int    SCAN_FILE_POISON = 153153;
+const int    NO_SPACE         = 109901;
+const int    SIZE_COMMAND     = 153;
+const double EPSILON          = 1E-6;
+const char   ERROR_TYPE       = '0';
+
 enum types
 {
     NUM = 0,
@@ -10,21 +17,30 @@ enum types
     VAR = 2,
 };
 
-enum operators
+enum operators //TODO заменить костыль с аски кодами
 {
-    ADD  = 10,
-    SUB  = 20,
-    MULL = 30,
-    DIV  = 40,
+    ADD  = 43,
+    MULL = 42,
+    SUB  = 45,
+    DIV  = 47,
+    DEG  = 94,
 };
+
+union value_t
+{
+    int    oper_number;
+    char   oper;
+    double number;
+};
+
 
 struct node_t
 {
-    types     type;
-    int       value;    //TODO read about union
-    node_t*   left;
-    node_t*   right;
-    node_t*   parent;
+    types         type;
+    union value_t value;
+    node_t*       left;
+    node_t*       right;
+    node_t*       parent;
 };
 
 struct tree_t
@@ -33,8 +49,14 @@ struct tree_t
     const char* func;
     int         line;
     int         number_nods;
-    char*       file;
+    const char* file;
     node_t*     first_node;
+};
+
+struct expr_t
+{
+    char* string;
+    int   index;
 };
 
 struct file_t
@@ -45,33 +67,43 @@ struct file_t
     char*  buffer;
 };
 
-const size_t NO_SPACE         = 15;
-const size_t SCAN_FILE_POISON = 153153;
-
-const int ERROR_TYPE = -1;
-
-size_t ScanFile           (struct file_t* file_struct);
-size_t FindNoSpace        (struct file_t* tree, size_t index);
-size_t SkipSpacesForPrint (struct file_t* tree, size_t index);
+double RaiseToDegree      (double number, double power);
 
 char WhatIsOperator       (int value_oper);
 
+int CheckFile             (FILE* file);
+int TreeDtor              (struct tree_t* root);
+int NodsDtor              (struct node_t* node);
+int IsEqual               (double elem1, double elem2);
+
 void ClearBuffer          ();
 void CheckFclose          (FILE* file_ptr);
-void ChangeSymbolInBuffer (struct file_t* buf_struct, size_t size_buffer, char symbol1, char symbol2);
+void ExprDtor             (struct expr_t* expr);
+void ExprCtor             (struct expr_t* expr);
+void DoNodeOperation      (struct node_t* node);
+void DeleteLocalNods      (struct node_t* node);
+void ChangeNodeMullDeg    (struct node_t* node, int value);
+void SyntaxError          (const char* file, const char* func, int line);
+void BufferCtor           (struct file_t* tree, struct expr_t* expr);
+void ChangeSymbolInBuffer (char* buffer, size_t size_buffer, char symbol1, char symbol2);
+void ChangeNodeAddSub     (struct node_t* node, node_t* desired_node, node_t* undesired_node);
+
+size_t FindNoSpace        (struct file_t* akin, size_t index);
+size_t SkipSpacesForPrint (struct file_t* akin, size_t index);
+size_t ScanFile           (struct file_t* akin, struct expr_t* expr);
 
 tree_t* TreeCtor          (struct tree_t* root);
 
-node_t* ReadTree          (struct file_t* tree, struct tree_t* root);
-node_t* CreateNode        (types arg, int value, node_t* left, node_t* right, struct tree_t* root);
+node_t* Simplifier        (struct node_t* node, struct tree_t* tree);
+node_t* GetDollar         (struct expr_t* expr, struct tree_t* tree);
+node_t* GetBrackets       (struct expr_t* expr, struct tree_t* tree);
+node_t* GetNum            (struct expr_t* expr, struct tree_t* tree);
+node_t* GetAddSub         (struct expr_t* expr, struct tree_t* tree);
+node_t* GetMullDiv        (struct expr_t* expr, struct tree_t* tree);
+node_t* Diffr             (struct node_t* node, struct tree_t* tree);
+node_t* Copy              (struct node_t* node, struct tree_t* tree);
+node_t* GetVar            (struct expr_t* expr, struct tree_t* tree, char varyable);
+node_t* CreateNode        (types arg, double value, node_t* left, node_t* right, struct tree_t* root);
 
 types WhatTypeIs          (char* value);
-
-int WhatIsOperEnum        (char* value);
-int CheckFile             (FILE* file);
-int NodsDtor              (struct node_t* node);
-int TreeDtor              (struct tree_t* root);
-
-char* BufferCtor          (struct file_t* tree);
-
 #endif

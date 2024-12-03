@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "Differentiator.h"
-#include "Dump.h"
 
 void ClearBuffer()
 {
@@ -38,26 +38,30 @@ void CheckFclose(FILE* file_ptr)
     }
 }
 
-void ChangeSymbolInBuffer(struct file_t* buf_struct, size_t size_buffer, char symbol1, char symbol2)
+void ChangeSymbolInBuffer(char* buffer, size_t size_buffer, char symbol1, char symbol2)
 {
-    assert(buf_struct);
+    assert(buffer);
     assert(size_buffer > 0);
 
     for (unsigned long int i = 0; i < size_buffer; i++)
     {
-        if (buf_struct->buffer[i] == symbol1)
+        if (buffer[i] == symbol1)
         {
-            buf_struct->buffer[i] = symbol2;
+            buffer[i] = symbol2;
         }
     }
 }
 
-void MySystem(const char* str, int number_dump) //TODO rename
+void SystemWithIntArg(const char* str, int number_dump)
 {
-    char command_dot[153] = ""; //TODO magic const
+    char command_dot[SIZE_COMMAND] = "";
 
     sprintf(command_dot, str, number_dump);
 
     system(command_dot);
+}
 
+int IsEqual(double elem1, double elem2)
+{
+    return (fabs(elem1 - elem2) <= EPSILON);
 }

@@ -13,44 +13,39 @@ flags = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop
 
 #-------------------------------------------------------------------------------------------------------#
 
-all: differentiator clean
+all: chitka clean
 
 #-------------------------------------------------------------------------------------------------------#
 
-differentiator: Main.o CreateNode.o Dump.o Utilits.o ScanFile.o ReadTree.o
-	g++ Main.o CreateNode.o Dump.o Utilits.o ScanFile.o ReadTree.o $(flags) -o differentiator
+chitka: Main.o Functions.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o
+	g++ Main.o Functions.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o $(flags) -o chitkap
 
 Main.o: Main.cpp
 	g++ -c $(flags) Main.cpp
 
-CreateNode.o: CreateNode.cpp
-	g++ -c $(flags) CreateNode.cpp
+Functions.o: Functions.cpp
+	g++ -c $(flags) Functions.cpp
 
-Dump.o: Dump.cpp
-	g++ -c $(flags) Dump.cpp
-
-Utilits.o: Utilits.cpp
-	g++ -c $(flags) Utilits.cpp
+Constructor.o: Constructor.cpp
+	g++ -c $(flags) Constructor.cpp
 
 ScanFile.o: ScanFile.cpp
 	g++ -c $(flags) ScanFile.cpp
 
-ReadTree.o: ReadTree.cpp
-	g++ -c $(flags) ReadTree.cpp
+Utilits.o: Utilits.cpp
+	g++ -c $(flags) Utilits.cpp
 
-#-------------------------------------------------------------------------------------------------------#
+Dump.o: Dump.cpp
+	g++ -c $(flags) Dump.cpp
+
+Differentiator.o: Differentiator.cpp
+	g++ -c $(flags) Differentiator.cpp
+
+Simplifier.o: Simplifier.cpp
+	g++ -c $(flags) Simplifier.cpp
 
 clean:
 	rm -rf *.o *.exe *.exe.log *.exe.log.dmp
 
-#-------------------------------------------------------------------------------------------------------#
-
 run:
-	./differentiator && rm -rf differentiator
-
-#-------------------------------------------------------------------------------------------------------#
-
-clean_graph:
-	rm -r Graphs/*.png
-
-#-------------------------------------------------------------------------------------------------------#
+	./chitkap

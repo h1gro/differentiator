@@ -1,37 +1,48 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "Differentiator.h"
 #include "Dump.h"
 
-const char* TREE_FILE = "Tree.txt";
+static const char* EXPR_FILE = "Expression.txt";
 
 int main()
 {
-    tree_t* root = NULL;
-    struct file_t tree = {};
+    struct expr_t expression = {};
+    struct file_t file_expr  = {};
 
-    root = TreeCtor(root);
+    file_expr.file_ptr = fopen(EXPR_FILE, "r");
 
-    tree.file_ptr = fopen(TREE_FILE, "a+");
+    ExprCtor(&expression);
 
-    if (ScanFile(&tree) == SCAN_FILE_POISON)
+    if (ScanFile(&file_expr, &expression) == SCAN_FILE_POISON)
     {
         return -1;
     }
 
-    ReadTree(&tree, root);
-    // node_t* arg1      = CreateNode(NUM, 2, NULL, NULL, root);
-    // node_t* arg2      = CreateNode(VAR, 1, NULL, NULL, root);
-    // node_t* oper_plus = CreateNode(OP, ADD, arg1, arg2, root);
+    tree_t* tree = NULL;
+    tree = TreeCtor(tree);
 
-    //root->first_node = oper_plus;
+    tree->first_node = GetDollar(&expression, tree);
 
-    //WriteTree(oper_plus, tree.file_ptr);
-    TreeDump(root->first_node);
+    TreeDump(tree->first_node);
 
-    CheckFclose(tree.file_ptr);
-    TreeDtor(root);
-    free(tree.buffer);
+    Simplifier(tree->first_node, tree);
+
+    TreeDump(tree->first_node);
+
+    tree->first_node = Diffr(tree->first_node, tree);
+
+    TreeDump(tree->first_node);
+
+    Simplifier(tree->first_node, tree);
+
+    TreeDump(tree->first_node);
+
+    //NodsDtor(diffr_node);
+    TreeDtor(tree);
+
+    ExprDtor(&expression);
+
     return 0;
 }
