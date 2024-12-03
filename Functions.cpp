@@ -34,14 +34,14 @@ node_t* GetVar(struct expr_t* expr, struct tree_t* tree, char varyable)
 
     if (varyable == 'x')
     {
-        node = CreateNode(VAR, 1, NULL, NULL, tree);
+        node = CreateNode(VAR, value_t{.oper_number = 1}, NULL, NULL, tree);
         expr->index++;
 
         TreeDump(node);
     }
     else if (varyable == 'y')
     {
-        node = CreateNode(VAR, 2, NULL, NULL, tree);
+        node = CreateNode(VAR, value_t{.oper_number = 2}, NULL, NULL, tree);
         expr->index++;
 
         TreeDump(node);
@@ -74,7 +74,7 @@ node_t* GetNum(struct expr_t* expr, struct tree_t* tree)
         SyntaxError(__FILE__, __func__, __LINE__);
     }
 
-    node_t* node = CreateNode(NUM, val, NULL, NULL, tree);
+    node_t* node = CreateNode(NUM, value_t{.number = val}, NULL, NULL, tree);
 
     TreeDump(node);
 
@@ -98,12 +98,12 @@ node_t* GetAddSub(struct expr_t* expr, struct tree_t* tree)
 
         if (op == '+')
         {
-            val = CreateNode(OP, ADD, val, val2, tree);
+            val = CreateNode(OP, value_t{.oper_number = ADD}, val, val2, tree);
         }
 
         else
         {
-            val = CreateNode(OP, SUB, val, val2, tree);
+            val = CreateNode(OP, value_t{.oper_number = SUB}, val, val2, tree);
         }
     }
 
@@ -129,12 +129,12 @@ node_t* GetMullDiv(struct expr_t* expr, struct tree_t* tree)
 
         if (op == '*')
         {
-            val = CreateNode(OP, MULL, val, val2, tree);
+            val = CreateNode(OP, value_t{.oper_number = MULL}, val, val2, tree);
         }
 
         else
         {
-            val = CreateNode(OP, DIV, val, val2, tree);
+            val = CreateNode(OP, value_t{.oper_number = DIV}, val, val2, tree);
         }
     }
 
@@ -180,7 +180,7 @@ void SyntaxError(const char* file, const char* func, int line)
     exit(0);
 }
 
-node_t* CreateNode(types arg, double value, node_t* left, node_t* right, struct tree_t* root)
+node_t* CreateNode(types arg, union value_t value, node_t* left, node_t* right, struct tree_t* root)
 {
     assert(root);
 
@@ -193,27 +193,28 @@ node_t* CreateNode(types arg, double value, node_t* left, node_t* right, struct 
 
     new_node->type  = arg;
 
-    if (new_node->type == NUM)
-    {
-        new_node->value.number = value;
-    }
-
-    else if (new_node->type == OP)
-    {
-        char oper = WhatIsOperator(int(value));
-
-        printf("oper = %c\n", oper);
-
-        new_node->value.oper        = oper;
-        new_node->value.oper_number = int(value);
-
-        printf("node oper number = %d\n", new_node->value.oper_number);
-    }
-
-    else if (new_node->type == VAR)
-    {
-        new_node->value.number = value;
-    }
+    new_node->value = value;
+//     if (new_node->type == NUM)
+//     {
+//         new_node->value.number = value;
+//     }
+//
+//     else if (new_node->type == OP)
+//     {
+//         char oper = WhatIsOperator(int(value));
+//
+//         printf("oper = %c\n", oper);
+//
+//         new_node->value.oper        = oper;
+//         new_node->value.oper_number = int(value);
+//
+//         printf("node oper number = %d\n", new_node->value.oper_number);
+//     }
+//
+//     else if (new_node->type == VAR)
+//     {
+//         new_node->value.number = value;
+//     }
 
     root->number_nods++;
 

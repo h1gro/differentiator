@@ -47,5 +47,8 @@ Simplifier.o: Simplifier.cpp
 clean:
 	rm -rf *.o *.exe *.exe.log *.exe.log.dmp
 
+clean_graph:
+	rm -r Graphs/*.png
+
 run:
 	./chitkap

@@ -77,91 +77,9 @@ void PrintDefaultList(FILE* graph, struct node_t* tree)
 
     if (tree->right != NULL) {PrintDefaultList(graph, tree->right);}
 }
-//     /*ОПРЕДЕЛЕНИЕ ТИПА*/
-//
-//     if (tree->type == NUM)
-//     {
-//         fprintf(graph, "    %d [shape = Mrecord, label = \"{ %d | type NUM | { <f0> left %4p | <f1> right %4p}}\"];\n",
-//                             tree->value, tree->value, tree->left, tree->right);
-//     }
-//
-//     else if (tree->type == VAR)
-//     {
-//         if (tree->value == 1)
-//         {
-//             fprintf(graph, "    %d [shape = Mrecord, label = \"{ x | type VAR | { <f0> left %4p | <f1> right %4p}}\"];\n",
-//                                tree->value, tree->left, tree->right);
-//         }
-//     }
-//
-//     else if (tree->type == OP)
-//     {
-//         char oper = WhatIsOperator(tree->value);
-//
-//         fprintf(graph, "    \"%c\" [shape = Mrecord, label = \"{ \'%c\' | type OP | { <f0> left %4p | <f1> right %4p}}\"];\n",
-//                             oper, oper, tree->left, tree->right);
-//     }
-//
-    /*Рекурсия*/
-
-/*--------------------------LEFT----------------------------*/
-
-//     if (tree->left != NULL)
-//     {
-//         if ((tree->left->type == OP) && (tree->type == OP))
-//         {
-//             // char oper1 = WhatIsOperator(tree->value->);
-//             // char oper_left = WhatIsOperator(tree->left->value);
-//
-//             fprintf(graph, "    \"%c\" : <f0> -> \"%c\" [style = \"filled\"]\n", tree->value.oper, tree->left->value.oper);
-//             PrintDefaultList(graph, tree->left);
-//         }
-//
-//         if ((tree->type == OP) && (tree->left->type != OP))
-//         {
-//             //char oper1 = WhatIsOperator(tree->value);
-//
-//             fprintf(graph, "    \"%c\" : <f0> -> \"%d\" [style = \"filled\"]\n", tree->value.oper, tree->left->value);
-//             PrintDefaultList(graph, tree->left);
-//         }
-//
-//         else
-//         {
-//             fprintf(graph, "    \"%d\" : <f0> -> \"%d\" [style = \"filled\"]\n", tree->value.number, tree->left->value.number);
-//             PrintDefaultList(graph, tree->left);
-//         }
-//     }
-//
-// /*--------------------------RIGHT----------------------------*/
-//
-//     if (tree->right != NULL)
-//     {
-//         if ((tree->right->type == OP) && (tree->type == OP))
-//         {
-//             // char oper2 = WhatIsOperator(tree->value);
-//             // char oper_right = WhatIsOperator(tree->left->value);
-//
-//             fprintf(graph, "    \"%c\" : <f1> -> \"%c\" [style = \"filled\"]\n", tree->value.oper, tree->left->value.oper);
-//             PrintDefaultList(graph, tree->right);
-//         }
-//
-//         else if (tree->type == OP)
-//         {
-//             //char oper2 = WhatIsOperator(tree->value);
-//
-//             fprintf(graph, "    \"%c\" : <f1> -> \"%d\" [style = \"filled\"]\n", tree->value.oper, tree->right->value.number);
-//             PrintDefaultList(graph, tree->right);
-//         }
-//
-//         else
-//         {
-//             fprintf(graph, "    \"%c\" : <f1> -> \"%d\" [style = \"filled\"]\n", tree->value.number, tree->right->value.number);
-//             PrintDefaultList(graph, tree->right);
-//         }
-//     }
-// }
 
 /*-------------------------Inorder--------------------------*/
+
 void WriteTree(struct node_t* node, FILE* file_ptr)
 {
     assert(node);
@@ -240,24 +158,6 @@ void WriteNode(struct node_t* node, FILE* file_ptr)
         WriteNode(node->right, file_ptr);
     }
 }
-
-// void PrintSubtreeWithNumber(FILE* graph, struct node_t* tree)
-// {
-//     fprintf(graph, "    %4d [shape = Mrecord, label = \"{ %4d | type NUM { <f0> left %4p | <f1> right %4p}}\"];\n",
-//                             tree->value, tree->value, tree->left, tree->right);
-//
-//     if (tree->left != NULL)
-//     {
-//         fprintf(graph, "    %4d : <f0> -> %4s [style = \"filled\"]\n", tree->value, tree->left->value);
-//         PrintDefaultList(graph, tree->left);
-//     }
-//
-//     if (tree->right != NULL)
-//     {
-//         fprintf(graph, "    %4s : <f1> -> %4s [style = \"filled\"]\n", tree->value, tree->right->value);
-//         PrintDefaultList(graph, tree->right);
-//     }
-// }
 
 void PrintEdge(FILE* graph, struct node_t* node)
 {

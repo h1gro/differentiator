@@ -12,12 +12,12 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
 
     if (node->type == NUM)
     {
-        return CreateNode(NUM, 0, NULL, NULL, tree);
+        return CreateNode(NUM, value_t{.number = 0}, NULL, NULL, tree);
     }
 
     if (node->type == VAR)
     {
-        return CreateNode(NUM, 1, NULL, NULL, tree);
+        return CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
     }
 
     if (node->type == OP)
@@ -29,7 +29,7 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
                 node_t* node_left    = Diffr(node->left, tree);
                 node_t* node_right   = Diffr(node->right, tree);
 
-                node_t* diffr_result = CreateNode(OP, ADD, node_left, node_right, tree);
+                node_t* diffr_result = CreateNode(OP, value_t{.oper_number = ADD}, node_left, node_right, tree);
 
                 return diffr_result;
             }
@@ -39,7 +39,7 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
                 node_t* node_left    = Diffr(node->left, tree);
                 node_t* node_right   = Diffr(node->right, tree);
 
-                node_t* diffr_result = CreateNode(OP, SUB, node_left, node_right, tree);
+                node_t* diffr_result = CreateNode(OP, value_t{.oper_number = SUB}, node_left, node_right, tree);
 
                 return diffr_result;
             }
@@ -52,32 +52,32 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
                 node_t* copy_node_left  = Copy(node->left, tree);
                 node_t* copy_node_right = Copy(node->right, tree);
 
-                node_t* first_summand   = CreateNode(OP, MULL, diff_node_left, copy_node_right, tree);
-                node_t* second_summand  = CreateNode(OP, MULL, copy_node_left, diff_node_right, tree);
+                node_t* first_summand   = CreateNode(OP, value_t{.oper_number = MULL}, diff_node_left, copy_node_right, tree);
+                node_t* second_summand  = CreateNode(OP, value_t{.oper_number = MULL}, copy_node_left, diff_node_right, tree);
 
-                node_t* diffr_result    = CreateNode(OP, ADD, first_summand, second_summand, tree);
+                node_t* diffr_result    = CreateNode(OP, value_t{.oper_number = ADD}, first_summand, second_summand, tree);
 
                 return diffr_result;
             }
 
             case DIV:
             {
-                if (IsEqual(node->right->value.number, 0)) //TODO функция проверки занчения value в юнионe, Отправляю тип и само число и проверяю их на совместимость
-                {
-                    printf("DIVISION BY ZERO!!!\n");
-                    return NULL;
-                }
+                // if (IsEqual(node->right->value.number, 0)) //TODO функция проверки занчения value в юнионe, Отправляю тип и само число и проверяю их на совместимость
+                // {
+                //     printf("DIVISION BY ZERO!!!\n");
+                //     return NULL;
+                // }
 
                 node_t* diff_node_left    = Diffr(node->left, tree);
                 node_t* diff_node_right   = Diffr(node->right, tree);
 
-                node_t* first_subtrahend  = CreateNode(OP, MULL, diff_node_left, Copy(node->right, tree), tree);
-                node_t* second_subtrahend = CreateNode(OP, MULL, Copy(node->left, tree), diff_node_right, tree);
+                node_t* first_subtrahend  = CreateNode(OP, value_t{.oper_number = MULL}, diff_node_left, Copy(node->right, tree), tree);
+                node_t* second_subtrahend = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node->left, tree), diff_node_right, tree);
 
-                node_t* numerator         = CreateNode(OP, SUB, first_subtrahend, second_subtrahend, tree);
-                node_t* denominator       = CreateNode(OP, MULL, Copy(node->right, tree), Copy(node->right, tree), tree);
+                node_t* numerator         = CreateNode(OP, value_t{.oper_number = SUB}, first_subtrahend, second_subtrahend, tree);
+                node_t* denominator       = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node->right, tree), Copy(node->right, tree), tree);
 
-                node_t* diffr_result      = CreateNode(OP, DIV, numerator, denominator, tree);
+                node_t* diffr_result      = CreateNode(OP, value_t{.oper_number = DIV}, numerator, denominator, tree);
 
                 TreeDump(diffr_result);
 
@@ -86,21 +86,21 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
 
             case DEG:
             {
-                if (!IsEqual(node->right->value.number, 0)){return CreateNode(NUM, 0, NULL, NULL, tree);}
+                if (!IsEqual(node->right->value.number, 0)){return CreateNode(NUM, value_t{.number = 0}, NULL, NULL, tree);}
 
-                node_t* coeff        = CreateNode(NUM, node->right->value.number, NULL, NULL, tree);
+                node_t* coeff        = CreateNode(NUM, node->right->value, NULL, NULL, tree);
 
                 //printf("\nnode->right->value.number = %lg\n", node->right->value.number);
 
-                node_t* new_deg      = CreateNode(OP, SUB, Copy(node->right, tree), CreateNode(NUM, 1, NULL, NULL, tree), tree);
+                node_t* new_deg      = CreateNode(OP, value_t{.oper_number = SUB}, Copy(node->right, tree), CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree), tree);
 
                 //printf("done\n");
 
                 TreeDump(new_deg);
 
-                node_t* new_var      = CreateNode(OP, DEG, Copy(node->left, tree), new_deg, tree);
+                node_t* new_var      = CreateNode(OP, value_t{.oper_number = DEG}, Copy(node->left, tree), new_deg, tree);
 
-                node_t* diffr_result = CreateNode(OP, MULL, coeff, new_var, tree);
+                node_t* diffr_result = CreateNode(OP, value_t{.oper_number = MULL}, coeff, new_var, tree);
 
                 return diffr_result;
             }
@@ -116,11 +116,9 @@ node_t* Copy(struct node_t* node, struct tree_t* tree)
 {
     assert(node);
     assert(tree);
+
     printf("\nin copy\n");
-    return CreateNode(node->type, node->value.number, node->left, node->right, tree);
+
+    return CreateNode(node->type, node->value, node->left, node->right, tree);
 }
 
-// void WhatUnionType(struct union value, types expected_type)
-// {
-//
-// }

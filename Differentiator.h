@@ -67,6 +67,15 @@ struct file_t
     char*  buffer;
 };
 
+// #define _DO_UNION_VALUE_(_oper_number, _oper, _number, union_counter)\
+// {                                                                 \
+//     union value_t str##union_counter = {};                        \
+//     str##union_counter.oper_number = _oper_number;                 \
+//     str##union_counter.oper = _oper;                               \
+//     str##union_counter.number = _number;                           \
+//
+// }
+
 double RaiseToDegree      (double number, double power);
 
 char WhatIsOperator       (int value_oper);
@@ -103,7 +112,7 @@ node_t* GetMullDiv        (struct expr_t* expr, struct tree_t* tree);
 node_t* Diffr             (struct node_t* node, struct tree_t* tree);
 node_t* Copy              (struct node_t* node, struct tree_t* tree);
 node_t* GetVar            (struct expr_t* expr, struct tree_t* tree, char varyable);
-node_t* CreateNode        (types arg, double value, node_t* left, node_t* right, struct tree_t* root);
+node_t* CreateNode        (types arg, union value_t value, node_t* left, node_t* right, struct tree_t* root);
 
 types WhatTypeIs          (char* value);
 #endif
