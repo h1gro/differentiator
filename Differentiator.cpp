@@ -86,23 +86,9 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
 
             case DEG:
             {
-                if (!IsEqual(node->right->value.number, 0)){return CreateNode(NUM, value_t{.number = 0}, NULL, NULL, tree);}
+               node_t* diffr_result = DiffrDeg(tree, node);
 
-                node_t* coeff        = CreateNode(NUM, node->right->value, NULL, NULL, tree);
-
-                //printf("\nnode->right->value.number = %lg\n", node->right->value.number);
-
-                node_t* new_deg      = CreateNode(OP, value_t{.oper_number = SUB}, Copy(node->right, tree), CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree), tree);
-
-                //printf("done\n");
-
-                TreeDump(new_deg);
-
-                node_t* new_var      = CreateNode(OP, value_t{.oper_number = DEG}, Copy(node->left, tree), new_deg, tree);
-
-                node_t* diffr_result = CreateNode(OP, value_t{.oper_number = MULL}, coeff, new_var, tree);
-
-                return diffr_result;
+               return diffr_result;
             }
 
             default:    printf("ERROR IN DIFFERENTIATION\n");
@@ -122,3 +108,42 @@ node_t* Copy(struct node_t* node, struct tree_t* tree)
     return CreateNode(node->type, node->value, node->left, node->right, tree);
 }
 
+node_t* DiffrDeg(struct tree_t* tree, struct node_t* node)
+{
+    if ((node->left->type == NUM) && (node->right->type == NUM))
+    {
+        return CreateNode(NUM, value_t{.number = 0}, NULL, NULL, tree);
+    }
+
+    else if ((node->left->type == VAR) && (node->right->type == NUM))
+    {
+        node_t* coeff        = CreateNode(NUM, node->right->value, NULL, NULL, tree);
+
+        //printf("\nnode->right->value.number = %lg\n", node->right->value.number);
+
+        node_t* new_deg      = CreateNode(OP, value_t{.oper_number = SUB}, Copy(node->right, tree), CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree), tree);
+
+        //printf("done\n");
+
+        TreeDump(new_deg);
+
+        node_t* new_var      = CreateNode(OP, value_t{.oper_number = DEG}, Copy(node->left, tree), new_deg, tree);
+
+        node_t* diffr_result = CreateNode(OP, value_t{.oper_number = MULL}, coeff, new_var, tree);
+
+        TreeDump(diffr_result);
+
+        return diffr_result;
+    }
+
+//     else if (node->left->type == NUM)
+//     {
+//         node_t* log_base = CreateNode(OP, value_t{.oper_number = LN}, NULL, Copy(node->left, tree), tree);
+//
+//         node_t* deg_derivative = CreateNode(OP, value_t{.oper_number = MULL}, log_base, Diffr(node->right, tree), tree);
+//
+//         node_t* diffr_result = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node, tree), log_base, tree);
+//
+//         return diffr_result;
+//     }
+}

@@ -17,14 +17,14 @@ all: chitka clean
 
 #-------------------------------------------------------------------------------------------------------#
 
-chitka: Main.o Functions.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o
-	g++ Main.o Functions.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o $(flags) -o chitkap
+chitka: Main.o RecursDown.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o
+	g++ Main.o RecursDown.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o $(flags) -o chitkap
 
 Main.o: Main.cpp
 	g++ -c $(flags) Main.cpp
 
-Functions.o: Functions.cpp
-	g++ -c $(flags) Functions.cpp
+RecursDown.o: RecursDown.cpp
+	g++ -c $(flags) RecursDown.cpp
 
 Constructor.o: Constructor.cpp
 	g++ -c $(flags) Constructor.cpp

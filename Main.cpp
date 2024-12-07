@@ -40,7 +40,17 @@ int main()
     TreeDump(tree->first_node);
 
     //NodsDtor(diffr_node);
-    TreeDtor(tree);
+    //TreeDtor(tree);
+
+    for (int i = 0; i < tree->number_nods; i++)
+    {
+        printf("adr[%d] = %p\n", i, tree->addresses[i]);
+    }
+
+    DtorWithArray(tree);
+
+    free(tree->addresses);
+    free(tree);
 
     ExprDtor(&expression);
 

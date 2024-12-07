@@ -65,3 +65,11 @@ int IsEqual(double elem1, double elem2)
 {
     return (fabs(elem1 - elem2) <= EPSILON);
 }
+
+void FillingDataPoison(node_t** data, int num_el_poison)
+{
+    for (int i = 0; i < num_el_poison; i++)
+    {
+        data[i] = 0;
+    }
+}

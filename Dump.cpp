@@ -33,9 +33,7 @@ void PrintGraphHead(FILE* graph)
 {
     assert(graph);
 
-    fprintf(graph, "digraph G\n{\n    rankdir = TB;\n    bgcolor = \"pink2\"\n"
-                   "    node[color = \"#b503fc\", fontsize = 14];\n"
-                   "    edge[color = black, fontsize = 12, splines = ortho];\n\n");
+    fprintf(graph, "digraph G\n{\n    rankdir = TB;\n    bgcolor = \"white\"\n");
 
 }
 
@@ -48,22 +46,23 @@ void PrintDefaultList(FILE* graph, struct node_t* tree)
     {
         case VAR:
         {
-                 fprintf(graph, "    node%p [shape = Mrecord, label = \"{ x | type VAR | { <f0> left %4p | <f1> right %4p}}\"];\n",
+                 fprintf(graph, "    node%p [shape = Mrecord, style = filled, color = \"#4682B4\", fillcolor = aquamarine3, label = \"{ x | type VAR | { <f0> left %4p | <f1> right %4p}}\"];\n",
                                 tree, tree->left, tree->right);
                 break;
         }
 
         case NUM:
         {
-                fprintf(graph, "    node%p [shape = Mrecord, label = \"{ %lg | type NUM | { <f0> left %4p | <f1> right %4p}}\"];\n",
+                fprintf(graph, "    node%p [shape = Mrecord, style = filled, color = red, fillcolor = \"#F08080\", label = \"{ %lg | type NUM | { <f0> left %4p | <f1> right %4p}}\"];\n",
                                tree, tree->value.number, tree->left, tree->right);
                 break;
         }
 
         case OP:
         {
-                fprintf(graph, "    node%p [shape = Mrecord, label = \"{ \'%c\' | type OP | { <f0> left %4p | <f1> right %4p}}\"];\n",
-                               tree, tree->value.oper, tree->left, tree->right);
+                const char* oper = WhatIsOperator(tree->value.oper);
+                fprintf(graph, "    node%p [shape = Mrecord, style = filled, color = \"#006400\", fillcolor = \"#98FB98\", label = \"{ \'%s\' | type OP | { <f0> left %4p | <f1> right %4p}}\"];\n",
+                               tree, oper, tree->left, tree->right);
                 printf("node = %p, node->type = %d, node->value.oper_number = %d, node->value.oper = %c\n", tree, tree->type, tree->value.oper_number, tree->value.oper);
                 PrintEdge(graph, tree);
 
@@ -166,13 +165,13 @@ void PrintEdge(FILE* graph, struct node_t* node)
 
     if (node->left != NULL)
     {
-        fprintf(graph, "    node%p: <f0> -> node%p [style = \"filled\"];\n",
+        fprintf(graph, "    node%p: <f0> -> node%p [color = \"#696969\"];\n",
                             node, node->left);
     }
 
     if (node->right != NULL)
     {
-        fprintf(graph, "    node%p: <f1> -> node%p [style = \"filled\"];\n",
+        fprintf(graph, "    node%p: <f1> -> node%p [color = \"#696969\"];\n",
                             node, node->right);
     }
 }

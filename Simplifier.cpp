@@ -8,16 +8,21 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
     assert(node);
     assert(tree);
 
-    if ((node->left == NULL) || (node->right == NULL)){return node;}
+    if (node->left != NULL)
+    {
+        node->left  = Simplifier(node->left, tree);
+    }
 
-    node->left  = Simplifier(node->left, tree);
-    node->right = Simplifier(node->right, tree);
+    if (node->right != NULL)
+    {
+        node->right = Simplifier(node->right, tree);
+    }
 
     if ((node->left == NULL) || (node->right == NULL)){return node;}
 
     if ((node->right->type == NUM) && (node->left->type == NUM))
     {
-        DoNodeOperation(node);
+        DoNodeOperation(tree, node);
 
         TreeDump(node);
 
@@ -30,18 +35,18 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
         {
             case ADD:
             {
-                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(node, node->left, node->right);TreeDump(node);return node;}
+                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(tree, node, node->left, node->right);TreeDump(node);return node;}
 
-                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(node, node->right, node->left);TreeDump(node);return node;}
+                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(tree, node, node->right, node->left);TreeDump(node);return node;}
 
                 return node;
             }
 
             case SUB:
             {
-                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(node, node->left, node->right);TreeDump(node);return node;}
+                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(tree, node, node->left, node->right);TreeDump(node);return node;}
 
-                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(node, node->right, node->left);TreeDump(node);return node;}
+                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(tree, node, node->right, node->left);TreeDump(node);return node;}
 
                 return node;
             }
@@ -50,16 +55,16 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
             {
                 printf("node = %p\nnode->right = %p\nnode->left = %p\nnode->right->type = %d\nnode->left->type = %d\n", node, node->right, node->left, node->right->type, node->left->type);
 
-                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeMullDeg(node, 0);TreeDump(node);return node;}
+                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeMullDeg(tree, node, 0);TreeDump(node);return node;}
 
-                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeMullDeg(node, 0);TreeDump(node);return node;}
+                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeMullDeg(tree, node, 0);TreeDump(node);return node;}
 
                 return node;
             }
 
             case DEG:
             {
-                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeMullDeg(node, 1);TreeDump(node);return node;}
+                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeMullDeg(tree, node, 1);TreeDump(node);return node;}
 
                 return node;
             }
@@ -71,7 +76,7 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
     return node;
 }
 
-void ChangeNodeAddSub(struct node_t* node, node_t* desired_node, node_t* undesired_node)
+void ChangeNodeAddSub(struct tree_t* tree, struct node_t* node, node_t* desired_node, node_t* undesired_node)
 {
     assert(node);
     assert(desired_node);
@@ -86,21 +91,21 @@ void ChangeNodeAddSub(struct node_t* node, node_t* desired_node, node_t* undesir
     desired_node->left  = NULL;
     desired_node->right = NULL;
 
-    NodsDtor(desired_node);
-    NodsDtor(undesired_node);
+    NodsDtor(tree, desired_node);
+    NodsDtor(tree, undesired_node);
 }
 
-void ChangeNodeMullDeg(struct node_t* node, int value)
+void ChangeNodeMullDeg(struct tree_t* tree, struct node_t* node, int value)
 {
     assert(node);
 
     node->type         = NUM;
     node->value.number = value;
 
-    DeleteLocalNods(node);
+    DeleteLocalNods(tree, node);
 }
 
-void DoNodeOperation(struct node_t* node)
+void DoNodeOperation(struct tree_t* tree,struct node_t* node)
 {
     switch(node->value.oper)
     {
@@ -147,7 +152,7 @@ void DoNodeOperation(struct node_t* node)
 
     node->type = NUM;
 
-    DeleteLocalNods(node);
+    DeleteLocalNods(tree, node);
 }
 
 double RaiseToDegree(double number, double power)
