@@ -1,6 +1,7 @@
 #include <assert.h>
 
 #include "Differentiator.h"
+#include "DiffrFuncs.h"
 #include "Dump.h"
 
 node_t* Diffr(struct node_t* node, struct tree_t* tree)
@@ -26,72 +27,94 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
         {
             case ADD:
             {
-                node_t* node_left    = Diffr(node->left, tree);
-                node_t* node_right   = Diffr(node->right, tree);
-
-                node_t* diffr_result = CreateNode(OP, value_t{.oper_number = ADD}, node_left, node_right, tree);
-
-                return diffr_result;
+                return DiffrAdd(node, tree);
             }
 
             case SUB:
             {
-                node_t* node_left    = Diffr(node->left, tree);
-                node_t* node_right   = Diffr(node->right, tree);
-
-                node_t* diffr_result = CreateNode(OP, value_t{.oper_number = SUB}, node_left, node_right, tree);
-
-                return diffr_result;
+                return DiffrSub(node, tree);
             }
 
             case MULL:
             {
-                node_t* diff_node_left  = Diffr(node->left, tree);
-                node_t* diff_node_right = Diffr(node->right, tree);
-
-                node_t* copy_node_left  = Copy(node->left, tree);
-                node_t* copy_node_right = Copy(node->right, tree);
-
-                node_t* first_summand   = CreateNode(OP, value_t{.oper_number = MULL}, diff_node_left, copy_node_right, tree);
-                node_t* second_summand  = CreateNode(OP, value_t{.oper_number = MULL}, copy_node_left, diff_node_right, tree);
-
-                node_t* diffr_result    = CreateNode(OP, value_t{.oper_number = ADD}, first_summand, second_summand, tree);
-
-                return diffr_result;
+                return DiffrMull(node, tree);
             }
 
             case DIV:
             {
-                // if (IsEqual(node->right->value.number, 0)) //TODO функция проверки занчения value в юнионe, Отправляю тип и само число и проверяю их на совместимость
-                // {
-                //     printf("DIVISION BY ZERO!!!\n");
-                //     return NULL;
-                // }
-
-                node_t* diff_node_left    = Diffr(node->left, tree);
-                node_t* diff_node_right   = Diffr(node->right, tree);
-
-                node_t* first_subtrahend  = CreateNode(OP, value_t{.oper_number = MULL}, diff_node_left, Copy(node->right, tree), tree);
-                node_t* second_subtrahend = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node->left, tree), diff_node_right, tree);
-
-                node_t* numerator         = CreateNode(OP, value_t{.oper_number = SUB}, first_subtrahend, second_subtrahend, tree);
-                node_t* denominator       = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node->right, tree), Copy(node->right, tree), tree);
-
-                node_t* diffr_result      = CreateNode(OP, value_t{.oper_number = DIV}, numerator, denominator, tree);
-
-                TreeDump(diffr_result);
-
-                return diffr_result;
+                return DiffrDiv(node, tree);
             }
 
             case DEG:
             {
-               node_t* diffr_result = DiffrDeg(tree, node);
-
-               return diffr_result;
+                return DiffrDeg(node, tree);
             }
 
-            default:    printf("ERROR IN DIFFERENTIATION\n");
+            case SIN:
+            {
+                return DiffrSin(node, tree);
+            }
+
+            case COS:
+            {
+                return DiffrCos(node, tree);
+            }
+
+            case TAN:
+            {
+                return DiffrTan(node, tree);
+            }
+
+            case COT:
+            {
+                return DiffrCot(node, tree);
+            }
+
+            case SHX:
+            {
+                return DiffrShx(node, tree);
+            }
+
+            case CHS:
+            {
+                return DiffrChs(node, tree);
+            }
+
+            case THX:
+            {
+                return DiffrThx(node, tree);
+            }
+
+            case CTH:
+            {
+                return DiffrCth(node, tree);
+            }
+
+//             case LOG:
+//             {
+//                 node_t* coef_one    = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
+//
+//                 node_t* ln          = CreateNode(OP, value_t{.oper_number = LN}, NULL, Copy(node->left, tree);
+//
+//                 node_t* denominator = CreateNode(OP, value_t{.oper_number = MULL}, ln, Copy(node->right, tree), tree);
+//
+//                 node_t* dif_lg      = CreateNode(OP, value_t{.oper_number = DIV}, coef_one, denominator, tree);
+//
+//                 node_t* node_mull   = CreateNode(OP, value_t{.oper_number = MULL}, dif_lg, Diffr(node->right, tree), tree);
+//
+//                 return node_mull;
+//             }
+            case LN:
+            {
+                return DiffrLn(node, tree);
+            }
+
+            case EXP:
+            {
+                return CreateNode(NUM, value_t{.number = 0}, NULL, NULL, tree);
+            }
+
+            default: printf("ERROR IN DIFFERENTIATION\n");
         }
     }
 
@@ -100,50 +123,34 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
 
 node_t* Copy(struct node_t* node, struct tree_t* tree)
 {
-    assert(node);
     assert(tree);
 
     printf("\nin copy\n");
 
-    return CreateNode(node->type, node->value, node->left, node->right, tree);
+    if ((node->left == NULL) && (node->right != NULL))
+    {
+        return CreateNode(node->type, node->value, node->left, Copy(node->right, tree), tree);
+    }
+
+    if ((node->left != NULL) && (node->right == NULL))
+    {
+        return CreateNode(node->type, node->value, Copy(node->left, tree), node->right, tree);
+    }
+
+    if ((node->left == NULL) && (node->right == NULL))
+    {
+        return CreateNode(node->type, node->value, node->left, node->right, tree);
+    }
+
+    return CreateNode(node->type, node->value, Copy(node->left, tree), Copy(node->right, tree), tree);
 }
 
-node_t* DiffrDeg(struct tree_t* tree, struct node_t* node)
-{
-    if ((node->left->type == NUM) && (node->right->type == NUM))
-    {
-        return CreateNode(NUM, value_t{.number = 0}, NULL, NULL, tree);
-    }
-
-    else if ((node->left->type == VAR) && (node->right->type == NUM))
-    {
-        node_t* coeff        = CreateNode(NUM, node->right->value, NULL, NULL, tree);
-
-        //printf("\nnode->right->value.number = %lg\n", node->right->value.number);
-
-        node_t* new_deg      = CreateNode(OP, value_t{.oper_number = SUB}, Copy(node->right, tree), CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree), tree);
-
-        //printf("done\n");
-
-        TreeDump(new_deg);
-
-        node_t* new_var      = CreateNode(OP, value_t{.oper_number = DEG}, Copy(node->left, tree), new_deg, tree);
-
-        node_t* diffr_result = CreateNode(OP, value_t{.oper_number = MULL}, coeff, new_var, tree);
-
-        TreeDump(diffr_result);
-
-        return diffr_result;
-    }
-
-//     else if (node->left->type == NUM)
+// bool CheckUnionType(union value_t value, types type)
+// {
+//       if (value->oper_number == )
 //     {
-//         node_t* log_base = CreateNode(OP, value_t{.oper_number = LN}, NULL, Copy(node->left, tree), tree);
-//
-//         node_t* deg_derivative = CreateNode(OP, value_t{.oper_number = MULL}, log_base, Diffr(node->right, tree), tree);
-//
-//         node_t* diffr_result = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node, tree), log_base, tree);
-//
-//         return diffr_result;
+//         return TYPE_IS_RIGHT;
 //     }
-}
+//
+//     return TYPE_IS_NOT_RIGHT;
+// }

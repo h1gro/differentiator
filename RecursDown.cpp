@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "Differentiator.h"
+#include "RecursDown.h"
 #include "Dump.h"
 
 node_t* GetDollar(struct expr_t* expr, struct tree_t* tree)
@@ -215,10 +216,23 @@ node_t* GetFunction(struct expr_t* expr, struct tree_t* tree)
     while ((expr->string[expr->index] != ' ') && (expr->string[expr->index] != '('))
     {
         function[word_lenght] = expr->string[expr->index];
+
         printf("%c", function[word_lenght]);
+
         word_lenght++;
+
         expr->index++;
+
+        if (expr->string[expr->index - 1] == 'e'){break;}
     }
+
+    //printf("%c", expr->string[expr->index]);
+    // if (expr->string[expr->index + 1] == '$')
+    // {
+    //     printf("\n\nGEEEET\n\n");
+    //     expr->index--;
+    // }
+
     printf("\n");
 
     //node_t* val = CompareFuncs(expr, tree, function, word_lenght);
@@ -247,6 +261,14 @@ node_t* GetFunction(struct expr_t* expr, struct tree_t* tree)
 
         return val;
     }
+    else if (oper_number == EXP)
+    {
+        node_t* val = CreateNode(OP, value_t{.oper_number = EXP}, NULL, NULL, tree);
+
+        TreeDump(val);
+
+        return val;
+    }
     else
     {
         SyntaxError(__FILE__, __func__, __LINE__);
@@ -257,11 +279,11 @@ int CompareFuncs(struct expr_t* expr, struct tree_t* tree, char* function, int w
 {
     for (int i = 0; i < NUM_FUNCS; i++)
     {
-        printf("keyword = %s\nptr_struct = %p\n ptr_str = %p\n", ((tree->ptr_on_keywords)[i]).func, &tree->ptr_on_keywords[i], tree->ptr_on_keywords[i].func);
-        if (strncmp(function, tree->ptr_on_keywords[i].func, word_lenght) == 0)
+        printf("keyword = %s\nptr_struct = %p\n ptr_str = %p\n", keywords[i].func, &keywords[i], keywords[i].func);
+        if (strncmp(function, keywords[i].func, word_lenght) == 0)
         {
-            printf("op = %d\n", tree->ptr_on_keywords[i].func_enum);
-            return tree->ptr_on_keywords[i].func_enum;
+            printf("op = %d\n", keywords[i].func_enum);
+            return keywords[i].func_enum;
         }
     }
 

@@ -2,16 +2,17 @@
 #include <string.h>
 
 #include "Differentiator.h"
+#include "RecursDown.h"
 #include "Dump.h"
 
-static const char* EXPR_FILE = "Expression.txt";
+static const char* INPUT_FILE = "Input.txt";
 
 int main()
 {
     struct expr_t expression = {};
     struct file_t file_expr  = {};
 
-    file_expr.file_ptr = fopen(EXPR_FILE, "r");
+    file_expr.file_ptr = fopen(INPUT_FILE, "r");
 
     ExprCtor(&expression);
 

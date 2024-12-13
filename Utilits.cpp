@@ -18,10 +18,10 @@ int CheckFile(FILE* file)
     if (file == NULL)
     {
         printf("file not opened\n");
-        return -1;
+        return CHECK_FILE_ERROR;
     }
 
-    return 0;
+    return CHECK_FILE_OK;
 }
 
 void CheckFclose(FILE* file_ptr)

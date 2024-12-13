@@ -103,6 +103,12 @@ const char* WhatIsOperator(int value_oper)
 
         case CTH:   return "cth";
 
+        case LOG:   return "log";
+
+        case LN :   return "ln";
+
+        case EXP:   return "e";
+        
         default:    printf("ERROR TYPE\n");
                     return ERROR_TYPE;
     }
@@ -139,12 +145,6 @@ tree_t* TreeCtor(struct tree_t* tree)
     tree->addresses = (node_t**) calloc(tree->array_addr_size, sizeof(node_t*));
 
     tree->first_node = NULL;
-
-    /*Массив структур с ключевыми словами*/
-    struct func_t keywords[NUM_FUNCS] = {{"hah", ADD}, {"sin", SIN}, {"cos", COS}, {"tg", TAN}, {"ctg", COT},
-                                         {"sh",  SHX}, {"ch",  CHS}, {"th", THX}, {"cth", CTH}};
-
-    tree->ptr_on_keywords = &keywords[0];
 
     return tree;
 }

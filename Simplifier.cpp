@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <math.h>
 
 #include "Differentiator.h"
 #include "Dump.h"
@@ -107,7 +108,7 @@ void ChangeNodeMullDeg(struct tree_t* tree, struct node_t* node, int value)
 
 void DoNodeOperation(struct tree_t* tree,struct node_t* node)
 {
-    switch(node->value.oper)
+    switch(node->value.oper) //TODO make func check type
     {
         case ADD:
         {
@@ -143,6 +144,20 @@ void DoNodeOperation(struct tree_t* tree,struct node_t* node)
         case DEG:
         {
             node->value.number = RaiseToDegree(node->left->value.number, node->right->value.number);
+
+            break;
+        }
+
+        case SIN:
+        {
+            node->value.number = sin(node->right->value.number);
+
+            break;
+        }
+
+        case COS:
+        {
+            node->value.number = cos(node->right->value.number);
 
             break;
         }

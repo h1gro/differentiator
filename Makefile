@@ -17,8 +17,8 @@ all: chitka clean
 
 #-------------------------------------------------------------------------------------------------------#
 
-chitka: Main.o RecursDown.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o
-	g++ Main.o RecursDown.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o $(flags) -o chitkap
+chitka: Main.o RecursDown.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o DiffrFuncs.o
+	g++ Main.o RecursDown.o Constructor.o ScanFile.o Utilits.o Dump.o Differentiator.o Simplifier.o DiffrFuncs.o $(flags) -o chitkap
 
 Main.o: Main.cpp
 	g++ -c $(flags) Main.cpp
@@ -43,6 +43,9 @@ Differentiator.o: Differentiator.cpp
 
 Simplifier.o: Simplifier.cpp
 	g++ -c $(flags) Simplifier.cpp
+
+DiffrFuncs.o: DiffrFuncs.cpp
+	g++ -c $(flags) DiffrFuncs.cpp
 
 clean:
 	rm -rf *.o *.exe *.exe.log *.exe.log.dmp
