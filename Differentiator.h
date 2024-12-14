@@ -21,8 +21,8 @@ enum returns
     CHECK_FILE_ERROR   = -1,
     NO_SPACE           = 109901,
     SCAN_FILE_POISON   = 153153,
-    TYPE_IS_RIGHT      = 11,
-    TYPE_IS_NOT_RIGHT  = -11,
+    TYPE_IS_RIGHT      = 1,
+    TYPE_IS_NOT_RIGHT  = 0,
 };
 
 enum types
@@ -111,7 +111,7 @@ const struct func_t keywords[NUM_FUNCS] = {{"sin", SIN}, {"cos", COS}, {"tg", TA
 
 types WhatTypeIs           (char* value);
 
-bool CheckUnionType        (union value_t value, types type);
+bool CheckUnionType        (struct node_t* node, types type);
 
 double RaiseToDegree       (double number, double power);
 
@@ -131,7 +131,7 @@ void ExprDtor              (struct expr_t* expr);
 void ExprCtor              (struct expr_t* expr);
 void DoNodeOperation       (struct tree_t* tree, struct node_t* node);
 void DeleteLocalNods       (struct tree_t* tree, struct node_t* node);
-void ChangeNodeMullDeg     (struct tree_t* tree, struct node_t* node, int value);
+void ChangeNodeMullDeg     (struct tree_t* tree, struct node_t* node, struct node_t* new_node);
 
 void FillingDataPoison     (node_t** data, int num_el_poison);
 void FileSize              (struct file_t* file, struct expr_t* expr);

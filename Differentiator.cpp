@@ -145,12 +145,14 @@ node_t* Copy(struct node_t* node, struct tree_t* tree)
     return CreateNode(node->type, node->value, Copy(node->left, tree), Copy(node->right, tree), tree);
 }
 
-// bool CheckUnionType(union value_t value, types type)
-// {
-//       if (value->oper_number == )
-//     {
-//         return TYPE_IS_RIGHT;
-//     }
-//
-//     return TYPE_IS_NOT_RIGHT;
-// }
+bool CheckUnionType(struct node_t* node, types type)
+{
+    if (node == NULL) {return NULL;}
+
+    if (node->type == type)
+    {
+        return TYPE_IS_RIGHT;
+    }
+
+    return TYPE_IS_NOT_RIGHT;
+}

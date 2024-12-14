@@ -37,34 +37,34 @@ void PrintGraphHead(FILE* graph)
 
 }
 
-void PrintDefaultList(FILE* graph, struct node_t* tree)
+void PrintDefaultList(FILE* graph, struct node_t* node)
 {
     assert(graph);
-    assert(tree);
+    assert(node);
 
-    switch(tree->type)
+    switch(node->type)
     {
         case VAR:
         {
                  fprintf(graph, "    node%p [shape = Mrecord, style = filled, color = \"#4682B4\", fillcolor = aquamarine3, label = \"{ x | type VAR | { <f0> left %4p | <f1> right %4p}}\"];\n",
-                                tree, tree->left, tree->right);
+                                node, node->left, node->right);
                 break;
         }
 
         case NUM:
         {
                 fprintf(graph, "    node%p [shape = Mrecord, style = filled, color = red, fillcolor = \"#F08080\", label = \"{ %lg | type NUM | { <f0> left %4p | <f1> right %4p}}\"];\n",
-                               tree, tree->value.number, tree->left, tree->right);
+                               node, node->value.number, node->left, node->right);
                 break;
         }
 
         case OP:
         {
-                const char* oper = WhatIsOperator(tree->value.oper);
+                const char* oper = WhatIsOperator(node->value.oper);
                 fprintf(graph, "    node%p [shape = Mrecord, style = filled, color = \"#006400\", fillcolor = \"#98FB98\", label = \"{ \'%s\' | type OP | { <f0> left %4p | <f1> right %4p}}\"];\n",
-                               tree, oper, tree->left, tree->right);
-                printf("node = %p, node->type = %d, node->value.oper_number = %d, node->value.oper = %c\n", tree, tree->type, tree->value.oper_number, tree->value.oper);
-                PrintEdge(graph, tree);
+                               node, oper, node->left, node->right);
+                printf("node = %p, node->type = %d, node->value.oper_number = %d, node->value.oper = %c\n", node, node->type, node->value.oper_number, node->value.oper);
+                PrintEdge(graph, node);
 
                 break;
         }
@@ -72,9 +72,9 @@ void PrintDefaultList(FILE* graph, struct node_t* tree)
         default:    printf("ERROR TYPE IN DUMP\n");
     }
 
-    if (tree->left != NULL) {PrintDefaultList(graph, tree->left);}
+    if (node->left != NULL) {PrintDefaultList(graph, node->left);}
 
-    if (tree->right != NULL) {PrintDefaultList(graph, tree->right);}
+    if (node->right != NULL) {PrintDefaultList(graph, node->right);}
 }
 
 /*-------------------------Inorder--------------------------*/

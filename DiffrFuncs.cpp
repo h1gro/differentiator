@@ -112,7 +112,7 @@ node_t* DiffrDeg(struct node_t* node, struct tree_t* tree)
         return second_mull;
     }
 
-    else if ((node->left->type == OP) && (node->right->type == OP) || (node->left->type == OP) && (node->right->type == VAR) || ((node->left->type == VAR) && (node->right->type == VAR)))
+    else if (((node->left->type == OP) && (node->right->type == OP)) || ((node->left->type == OP) && (node->right->type == VAR)) || ((node->left->type == VAR) && (node->right->type == VAR)))
     {
         if (node->left->value.oper_number == EXP)
         {
@@ -130,6 +130,11 @@ node_t* DiffrDeg(struct node_t* node, struct tree_t* tree)
         node_t* node_mull      = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node, tree), dif_part, tree);
 
         return node_mull;
+    }
+
+    else
+    {
+        return NULL;
     }
 }
 
