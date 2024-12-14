@@ -15,6 +15,8 @@ const double EPSILON             = 1E-6;
 
 static const char*  ERROR_TYPE   = "ERROR_OPERATOR";
 
+static FILE* dump_html = fopen("Dump.html", "w+");
+
 enum returns
 {
     CHECK_FILE_OK      = 77,

@@ -159,10 +159,20 @@ void ChangeNodeMullDeg(struct tree_t* tree, struct node_t* node, struct node_t* 
 {
     assert(node);
 
+    node_t* fict1 = node->right;
+    node_t* fict2 = node->left;
+
+    node->right = new_node->right;
+    node->left  = new_node->left;
+
+    new_node->right = NULL;
+    new_node->left  = NULL;
+
     node->type  = new_node->type;
     node->value = new_node->value;
 
-    DeleteLocalNods(tree, node);
+    NodsDtor(tree, fict1);
+    NodsDtor(tree, fict2);
 }
 
 void DoNodeOperation(struct tree_t* tree,struct node_t* node)

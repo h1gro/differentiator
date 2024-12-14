@@ -52,13 +52,20 @@ node_t* DiffrDiv(struct node_t* node, struct tree_t* tree)
 {
     node_t* diff_node_left = NULL;
 
-    if (node->left->value.oper_number == EXP)
+    if (CheckUnionType(node->left, OP))
     {
-        diff_node_left = Copy(node->left, tree);
+        if (node->left->value.oper_number == EXP)
+        {
+            diff_node_left = Copy(node->left, tree);
+        }
+        else
+        {
+            diff_node_left = Diffr(node->left, tree);
+        }
     }
     else
     {
-        diff_node_left = Diffr(node->left, tree);
+        return node;
     }
 
     node_t* diff_node_right   = Diffr(node->right, tree);

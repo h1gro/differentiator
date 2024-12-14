@@ -54,6 +54,6 @@ int main()
     free(tree);
 
     ExprDtor(&expression);
-
+    fclose(dump_html);
     return 0;
 }

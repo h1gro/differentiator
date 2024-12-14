@@ -12,7 +12,6 @@ void TreeDump(struct node_t* tree)
     assert(tree);
 
     FILE* dump = fopen(DUMP_DOT, "w");
-
     assert(dump);
 
     PrintGraphHead(dump);
@@ -24,6 +23,13 @@ void TreeDump(struct node_t* tree)
 
     static int number_dump = 0;
     SystemWithIntArg("dot Dump.dot -Tpng -o Graphs/Dump%03d.png", number_dump);
+    if (number_dump == 0)
+    {
+        fprintf(dump_html, "<pre>\n");
+    }
+
+    fprintf(dump_html, "\n<img src = \"Graphs/Dump%03d.png\"/>\n", number_dump);
+
     number_dump++;
 
     printf("\n");
@@ -42,11 +48,13 @@ void PrintDefaultList(FILE* graph, struct node_t* node)
     assert(graph);
     assert(node);
 
+    printf("type = %d\n", node->type);
+
     switch(node->type)
     {
         case VAR:
         {
-                 fprintf(graph, "    node%p [shape = Mrecord, style = filled, color = \"#4682B4\", fillcolor = aquamarine3, label = \"{ x | type VAR | { <f0> left %4p | <f1> right %4p}}\"];\n",
+                fprintf(graph, "    node%p [shape = Mrecord, style = filled, color = \"#4682B4\", fillcolor = aquamarine3, label = \"{ x | type VAR | { <f0> left %4p | <f1> right %4p}}\"];\n",
                                 node, node->left, node->right);
                 break;
         }
@@ -65,7 +73,7 @@ void PrintDefaultList(FILE* graph, struct node_t* node)
                                node, oper, node->left, node->right);
                 printf("node = %p, node->type = %d, node->value.oper_number = %d, node->value.oper = %c\n", node, node->type, node->value.oper_number, node->value.oper);
                 PrintEdge(graph, node);
-
+                printf("done\n");
                 break;
         }
 
