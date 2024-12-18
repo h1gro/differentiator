@@ -1,0 +1,57 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{graphicx}
+\graphicspath{{noiseimages/}}
+\usepackage{enumitem}
+\date{}
+
+
+\newtheorem{task}{Задача}
+\begin{document}
+\begin{titlepage}
+\begin{center}
+	\textsc{MOSKOW INSTITUTE OF PHYSICS AND TECHNOLOGY}
+	\vspace{2ex}
+
+\end{center}
+\vspace{10ex}
+\begin{center}
+	\vspace{24ex}
+
+	\vspace{2ex}
+	\textbf{\Large{Differentiator}}
+	\vspace{34ex}
+	\begin{flushright}
+	\noindent
+	Done by:
+	\textit{Komarov Artem}
+	\end{flushright}
+	\vfill
+	Dolgoprudny, 2024
+\end{center}
+\end{titlepage}
+\newpage
+\section{Expression}
+\begin{center}
+	\textit{$ 1  - \cos( x  +  0  \cdot  0 )  \cdot  x $}
+\end{center}
+\section{Expression}
+\begin{center}
+	\textit{$ x $}
+\end{center}
+\section{Expression}
+\begin{center}
+	\textit{$ 0 $}
+\end{center}
+\section{Expression}
+\begin{center}
+	\textit{$ 0 $}
+\end{center}
+\section{Expression}
+\begin{center}
+	\textit{$ 0 $}
+\end{center}
+\end{document}
