@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 #include <string.h>
 
 #include "Differentiator.h"
@@ -26,22 +27,23 @@ int main()
 
     tree->first_node = GetDollar(&expression, tree);
 
-    TreeDump(tree->first_node);
+    FILE* tex_dump0 = TreeDump(tree->first_node);
 
     Simplifier(tree->first_node, tree);
 
-    TreeDump(tree->first_node);
+    tex_dump0 = TreeDump(tree->first_node);
 
     tree->first_node = Diffr(tree->first_node, tree);
 
-    TreeDump(tree->first_node);
+    tex_dump0 = TreeDump(tree->first_node);
 
     Simplifier(tree->first_node, tree);
 
-    TreeDump(tree->first_node);
+    tex_dump0 = TreeDump(tree->first_node);
 
-    //NodsDtor(diffr_node);
-    //TreeDtor(tree);
+    //fseek(tex_dump, 1, SEEK_END);
+    int return_fprintf = fprintf(tex_dump0, "\\end{document}\n");
+    printf("RETURN FPRINTF = %d\n\n", return_fprintf);
 
     for (int i = 0; i < tree->number_nods; i++)
     {
@@ -54,6 +56,9 @@ int main()
     free(tree);
 
     ExprDtor(&expression);
-    fclose(dump_html);
+
+    CheckFclose(dump_html);
+    CheckFclose(tex_dump0);
+
     return 0;
 }

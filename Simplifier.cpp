@@ -30,7 +30,7 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
 //
 //         return node;
 //     }
-    if (node->value.oper_number != EXP)
+    if (node->value.oper_number != EXP) //TODO проверка функцией CheckUnionType
     {
         DoNodeOperation(tree, node);
     }

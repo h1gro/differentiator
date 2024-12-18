@@ -71,7 +71,7 @@ node_t* GetPower(struct expr_t* expr, struct tree_t* tree)
         val = CreateNode(OP, value_t{.oper_number = DEG}, val, val2, tree);
     }
 
-    TreeDump(val);
+    //TreeDump(val);
 
     return val;
 
@@ -257,7 +257,7 @@ node_t* GetFunction(struct expr_t* expr, struct tree_t* tree)
 
         node_t* val = CreateNode(OP, value_t{.oper_number = oper_number}, NULL, val2, tree);
 
-        TreeDump(val);
+        //TreeDump(val);
 
         return val;
     }
@@ -265,7 +265,7 @@ node_t* GetFunction(struct expr_t* expr, struct tree_t* tree)
     {
         node_t* val = CreateNode(OP, value_t{.oper_number = EXP}, NULL, NULL, tree);
 
-        TreeDump(val);
+        //TreeDump(val);
 
         return val;
     }
