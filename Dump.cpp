@@ -5,7 +5,7 @@
 #include "Dump.h"
 
 static const char* DUMP_DOT = "Dump.dot";
-static FILE* tex_dump  = fopen("Dump_tex.txt", "w+");
+static FILE* tex_dump  = fopen("LaTeX/Dump_tex.tex", "w+");
 
 /*-------------------------Graph Dump--------------------------*/
 
@@ -37,9 +37,6 @@ FILE* TreeDump(struct node_t* tree)
     static int number_tex_dump = 0;
     if (number_tex_dump == 0)
     {
-        // fprintf(tex_dump, "\\documentclass{article}\n\\newpage\n\\begin{document}\n"
-        //                   "\\maketitle\n\\begin{titlepage}\n\\begin{center}\n\t"
-        //                   "\\textsc{Differentiator by Komarov Artem}\n\\end{center}\n\\end{titlepage}\n");
         fprintf(tex_dump, "\\documentclass[a4paper,12pt]{article}\n\\usepackage{cmap}\n\\usepackage[T2A]{fontenc}\n\\usepackage[utf8]{inputenc}\n"
         "\\usepackage[english,russian]{babel}\n\\usepackage{graphicx}\n\\graphicspath{{noiseimages/}}\n"
         "\\usepackage{enumitem}\n\\date{}\n\n\n\\newtheorem{task}{Задача}\n\\begin{document}\n\\begin{titlepage}\n"
@@ -253,15 +250,105 @@ void PrintExprInTex(struct node_t* node, FILE* dump)
             fprintf(dump, " %s ", oper);
 
             PrintExprInTex(node->right, dump);
+//             if ((CheckUnionType(node->left, OP)) && ((node->left->value.oper_number == MULL) || (node->left->value.oper_number == DIV)))
+//             {
+//                 fprintf(dump, "(");
+//
+//                 PrintExprInTex(node->left, dump);
+//
+//                 fprintf(dump, ")");
+//             }
+//
+//             else
+//             {
+//                 PrintExprInTex(node->left, dump);
+//             }
+//
+//             fprintf(dump, " %s ", oper);
+//
+//             if ((CheckUnionType(node->right, OP)) && ((node->right->value.oper_number == MULL) || (node->right->value.oper_number == DIV)))
+//             {
+//                 fprintf(dump, "(");
+//
+//                 PrintExprInTex(node->right, dump);
+//
+//                 fprintf(dump, ")");
+//             }
+//
+//             else
+//             {
+//                 PrintExprInTex(node->right, dump);
+//             }
         }
 
         else if (strcmp(oper, "*") == 0)
         {
-            PrintExprInTex(node->left, dump);
+            if (((CheckUnionType(node->left, NUM)) && (node->left->value.number < 0))
+              || ((CheckUnionType(node->left, OP)) && ((node->left->value.oper_number == ADD)
+                                                   || (node->left->value.oper_number == SUB))))
+            {
+                fprintf(dump, "(");
+
+                PrintExprInTex(node->left, dump);
+
+                fprintf(dump, ")");
+            }
+
+            else
+            {
+                PrintExprInTex(node->left, dump);
+            }
 
             fprintf(dump, " \\cdot ");
 
-            PrintExprInTex(node->right, dump);
+            if (((CheckUnionType(node->right, NUM)) && (node->right->value.number < 0))
+              || ((CheckUnionType(node->right, OP)) && ((node->right->value.oper_number == ADD)
+                                                   || (node->right->value.oper_number == SUB))))
+            {
+                fprintf(dump, "(");
+
+                PrintExprInTex(node->right, dump);
+
+                fprintf(dump, ")");
+            }
+
+            else
+            {
+                PrintExprInTex(node->right, dump);
+            }
+        }
+
+        else if (strcmp(oper, "^") == 0)
+        {
+            if (CheckUnionType(node->left, OP))
+            {
+                fprintf(dump, "{(");
+
+                PrintExprInTex(node->left, dump);
+
+                fprintf(dump, ")}");
+            }
+
+            else
+            {
+                PrintExprInTex(node->left, dump);
+            }
+
+            fprintf(dump, " %s ", oper);
+
+            if (CheckUnionType(node->right, OP))
+            {
+                fprintf(dump, "{(");
+
+                PrintExprInTex(node->right, dump);
+
+                fprintf(dump, ")}");
+            }
+
+            else
+            {
+                PrintExprInTex(node->right, dump);
+            }
         }
 
         else if (strcmp(oper, "e") == 0)
@@ -277,6 +364,7 @@ void PrintExprInTex(struct node_t* node, FILE* dump)
 
             fprintf(dump, ") ");
         }
+
     }
 
     else if (CheckUnionType(node, NUM))
