@@ -5,19 +5,19 @@
 #include "Dump.h"
 
 static const char* DUMP_DOT = "Dump.dot";
-static FILE* tex_dump  = fopen("LaTeX/Dump_tex.tex", "w+");
+static FILE* tex_dump       = fopen("LaTeX/Dump_tex.tex", "w+");
 
 /*-------------------------Graph Dump--------------------------*/
 
-FILE* TreeDump(struct node_t* tree, dump_calls command)
+FILE* TreeDump(struct node_t* node, struct node_t* copy_node, dump_calls command)
 {
-    assert(tree);
+    assert(node);
 
     FILE* dump_dot = fopen(DUMP_DOT, "w");
 
     PrintGraphHead(dump_dot);
 
-    PrintDefaultList(dump_dot, tree);
+    PrintDefaultList(dump_dot, node);
 
     fprintf(dump_dot, "}\n");
     fclose(dump_dot);
@@ -49,10 +49,9 @@ FILE* TreeDump(struct node_t* tree, dump_calls command)
         number_tex_dump = 1;
     }
 
-    LaTexDump(tree, tex_dump, command);
+    LaTexDump(node, copy_node, tex_dump, command);
 
     return tex_dump;
-    //fprintf(tex_dump, "\\end{document}\n");
 }
 
 void PrintGraphHead(FILE* graph)
@@ -123,38 +122,6 @@ void WriteNode(struct node_t* node, FILE* file_ptr)
 {
     assert(node);
     assert(file_ptr);
-
-//     /*-------------------------Preorder--------------------------*/
-//
-//     switch(node->type)
-//     {
-//         case OP:    fprintf(file_ptr, "{\"%c\"}", WhatIsOperator(node->value));
-//                     break;
-//
-//         case NUM:   fprintf(file_ptr, "\"%d\"", node->value);
-//                     break;
-//
-//         case VAR:   if (node->value == 1) {fprintf(file_ptr, "\"x\"");}
-//
-//                     else if (node->value == 2) {fprintf(file_ptr, "\"x\"");}
-//                     break;
-//
-//         default:    printf("ERROR IN VALUE\n");
-//
-//     }
-//
-//     if (node->left != NULL)
-//     {
-//         WriteTree(node->left, file_ptr);
-//     }
-//
-//     if (node->right != NULL)
-//     {
-//         WriteTree(node->right, file_ptr);
-//     }
-//
-//     fprintf(file_ptr, "}");
-
     /*-------------------------Inorder--------------------------*/
 
     if (node->left != NULL)
@@ -204,18 +171,7 @@ void PrintEdge(FILE* graph, struct node_t* node)
     }
 }
 
-// void OpenFiles(struct dumps_t* dump)
-// {
-//     assert(dump);
-//
-//     dump->dump_dot = fopen(DUMP_DOT, "w");
-//
-//     assert(dump->dump_dot);
-//
-//     dump->dump->html = fopen();
-// }
-
-void LaTexDump(struct node_t* node, FILE* dump, dump_calls command)
+void LaTexDump(struct node_t* node, struct node_t* copy_node, FILE* dump, dump_calls command)
 {
     assert(node);
     assert(dump);
@@ -227,12 +183,18 @@ void LaTexDump(struct node_t* node, FILE* dump, dump_calls command)
         case DEFAULT_EXPR:
         {
                               fprintf(dump, "\\section{Expression}\n\\begin{center}\n\t\\textit{$");
+
+                              PrintExprInTex(node, dump);
+
                               break;
         }
 
-        case DERIVATIVE:
+        case FINAL_DERIVATIVE:
         {
                               fprintf(dump, "\\section{Final Derivative}\n\\begin{center}\n\t\\textit{$");
+
+                              PrintExprInTex(node, dump);
+
                               break;
         }
 
@@ -241,19 +203,42 @@ void LaTexDump(struct node_t* node, FILE* dump, dump_calls command)
                               number_simplification++;
                               const char* sentense = GetSentense(number_simplification);
                               fprintf(dump, "\\section{%s}\n\\begin{center}\n\t\\textit{$", sentense);
+
+                              PrintExprInTex(copy_node, dump);
+
+                              fprintf(dump, " = ");
+
+                              PrintExprInTex(node, dump);
+                              break;
+        }
+
+        case DIFFERENTIATION:
+        {
+                              number_simplification++;
+                              const char* sentense = GetSentense(number_simplification);
+                              fprintf(dump, "\\section{%s}\n\\begin{center}\n\t\\textit{$", sentense);
+
+                              fprintf(dump, "(");
+
+                              PrintExprInTex(copy_node, dump);
+
+                              fprintf(dump, ")' = ");
+
+                              PrintExprInTex(node, dump);
                               break;
         }
 
         default:              printf("\nERROR IN COMMAND FOR LATEX DUMP\n");
     }
 
-    PrintExprInTex(node, dump);
-
     fprintf(dump, "$}\n\\end{center}\n");
 }
 
 void PrintExprInTex(struct node_t* node, FILE* dump)
 {
+    assert(node);
+    assert(dump);
+
     if (CheckUnionType(node, OP))
     {
         const char* oper = WhatIsOperator(node->value.oper);
@@ -278,35 +263,6 @@ void PrintExprInTex(struct node_t* node, FILE* dump)
             fprintf(dump, " %s ", oper);
 
             PrintExprInTex(node->right, dump);
-//             if ((CheckUnionType(node->left, OP)) && ((node->left->value.oper_number == MULL) || (node->left->value.oper_number == DIV)))
-//             {
-//                 fprintf(dump, "(");
-//
-//                 PrintExprInTex(node->left, dump);
-//
-//                 fprintf(dump, ")");
-//             }
-//
-//             else
-//             {
-//                 PrintExprInTex(node->left, dump);
-//             }
-//
-//             fprintf(dump, " %s ", oper);
-//
-//             if ((CheckUnionType(node->right, OP)) && ((node->right->value.oper_number == MULL) || (node->right->value.oper_number == DIV)))
-//             {
-//                 fprintf(dump, "(");
-//
-//                 PrintExprInTex(node->right, dump);
-//
-//                 fprintf(dump, ")");
-//             }
-//
-//             else
-//             {
-//                 PrintExprInTex(node->right, dump);
-//             }
         }
 
         else if (strcmp(oper, "*") == 0)

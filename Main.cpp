@@ -27,19 +27,27 @@ int main()
 
     tree->first_node = GetDollar(&expression, tree);
 
-    FILE* tex_dump0 = TreeDump(tree->first_node, DEFAULT_EXPR);
+    node_t* copy_node00 = Copy(tree->first_node, tree);
+
+    FILE* tex_dump0 = TreeDump(tree->first_node, copy_node00, DEFAULT_EXPR);
+
+    node_t* copy_node0 = Copy(tree->first_node, tree);
 
     Simplifier(tree->first_node, tree);
 
-    tex_dump0 = TreeDump(tree->first_node, SIMPLIFICATION);
+    tex_dump0 = TreeDump(tree->first_node, copy_node0, SIMPLIFICATION);
+
+    node_t* copy_node_dif = Copy(tree->first_node, tree);
 
     tree->first_node = Diffr(tree->first_node, tree);
 
-    tex_dump0 = TreeDump(tree->first_node, SIMPLIFICATION);
+    tex_dump0 = TreeDump(tree->first_node, copy_node_dif, DIFFERENTIATION);
+
+    node_t* copy_node = Copy(tree->first_node, tree);
 
     Simplifier(tree->first_node, tree);
 
-    tex_dump0 = TreeDump(tree->first_node, DERIVATIVE);
+    tex_dump0 = TreeDump(tree->first_node, copy_node, FINAL_DERIVATIVE);
 
     //fseek(tex_dump, 1, SEEK_END);
     int return_fprintf = fprintf(tex_dump0, "\\end{document}\n");

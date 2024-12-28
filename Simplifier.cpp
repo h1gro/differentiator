@@ -9,6 +9,8 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
     assert(node);
     assert(tree);
 
+    node_t* copy_node = Copy(node, tree);
+
     if (node->left != NULL)
     {
         node->left  = Simplifier(node->left, tree);
@@ -19,22 +21,10 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
         node->right = Simplifier(node->right, tree);
     }
 
-//     if (CheckUnionType(node, OP) && (node->value.oper_number == EXP))
-//     {
-//         printf("HEREEEEEEEE!!!!!!\n");
-//         node->value.number = exp(1);
-//
-//         node->type = NUM;
-//
-//         DeleteLocalNods(tree, node);
-//
-//         return node;
-//     }
-    if (node->value.oper_number != EXP) //TODO проверка функцией CheckUnionType
+    if ((CheckUnionType(node, OP)) && (node->value.oper_number != EXP))
     {
         DoNodeOperation(tree, node);
     }
-    //if ((node->left == NULL) || (node->right == NULL)){return node;}
 
     if (node->type == OP)
     {
@@ -42,25 +32,53 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
         {
             case ADD:
             {
-                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(tree, node, node->left, node->right);TreeDump(node, SIMPLIFICATION);return node;}
+                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0)))
+                {
+                    ChangeNodeAddSub(tree, node, node->left, node->right);
 
-                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(tree, node, node->right, node->left);TreeDump(node, SIMPLIFICATION);return node;}
+                    TreeDump(node, copy_node, SIMPLIFICATION);
+
+                    return node;
+                }
+
+                if ((node->left->type == NUM) && (IsEqual(node->left->value.number, 0)))
+                {
+                    ChangeNodeAddSub(tree, node, node->right, node->left);
+
+                    TreeDump(node, copy_node, SIMPLIFICATION);
+
+                    return node;
+                }
 
                 return node;
             }
 
             case SUB:
             {
-                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(tree, node, node->left, node->right);TreeDump(node, SIMPLIFICATION);return node;}
+                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0)))
+                {
+                    ChangeNodeAddSub(tree, node, node->left, node->right);
 
-                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(tree, node, node->right, node->left);TreeDump(node, SIMPLIFICATION);return node;}
+                    TreeDump(node, copy_node, SIMPLIFICATION);
+
+                    return node;
+                }
+
+                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0)))
+                {
+                    ChangeNodeAddSub(tree, node, node->right, node->left);
+
+                    TreeDump(node, copy_node, SIMPLIFICATION);
+
+                    return node;
+                }
 
                 return node;
             }
 
             case MULL:
             {
-                printf("node = %p\nnode->right = %p\nnode->left = %p\nnode->right->type = %d\nnode->left->type = %d\n", node, node->right, node->left, node->right->type, node->left->type);
+                //printf("node = %p\nnode->right = %p\nnode->left = %p\nnode->right->type = %d\nnode->left->type = %d\n", node, node->right, node->left, node->right->type, node->left->type);
 
                 if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0)))
                 {
@@ -93,7 +111,6 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
                     node_t* one = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
 
                     ChangeNodeMullDeg(tree, node, one);
-                    //TreeDump(node);
                 }
 
                 else if ((CheckUnionType(node->right, NUM))  && (IsEqual(node->right->value.number, 1)))
@@ -175,8 +192,10 @@ void ChangeNodeMullDeg(struct tree_t* tree, struct node_t* node, struct node_t* 
     NodsDtor(tree, fict2);
 }
 
-void DoNodeOperation(struct tree_t* tree,struct node_t* node)
+void DoNodeOperation(struct tree_t* tree, struct node_t* node)
 {
+    node_t* copy_node = Copy(node, tree);
+
     if (!CheckUnionType(node, OP) || (node == NULL))
     {
         return;
@@ -193,17 +212,24 @@ void DoNodeOperation(struct tree_t* tree,struct node_t* node)
                 node->value.number = node->left->value.number + node->right->value.number;
             }
 
-            else if ((CheckUnionType(node->left, OP)) && (node->left->value.oper_number == EXP) && (CheckUnionType(node->right, NUM)))
+            else if ((CheckUnionType(node->left, OP))   &&
+                     (CheckUnionType(node->right, NUM)) &&
+                     (node->left->value.oper_number == EXP))
             {
                 node->value.number = exp(1) + node->right->value.number;
             }
 
-            else if ((CheckUnionType(node->right, OP)) && (node->right->value.oper_number == EXP) && (CheckUnionType(node->left, NUM)))
+            else if ((CheckUnionType(node->right, OP)) &&
+                     (CheckUnionType(node->left, NUM)) &&
+                     (node->right->value.oper_number == EXP))
             {
                 node->value.number = exp(1) + node->left->value.number;
             }
 
-            else if ((node->right->value.oper_number == EXP) && (CheckUnionType(node->right, OP)) && (node->left->value.oper_number == EXP) && (CheckUnionType(node->left, OP)))
+            else if ((node->right->value.oper_number == EXP) &&
+                     (node->left->value.oper_number == EXP)  &&
+                     (CheckUnionType(node->right, OP))       &&
+                     (CheckUnionType(node->left, OP)))
             {
                 node->value.number = 2 * exp(1);
             }
@@ -258,17 +284,24 @@ void DoNodeOperation(struct tree_t* tree,struct node_t* node)
                 node->value.number = node->left->value.number - node->right->value.number;
             }
 
-            else if ((CheckUnionType(node->left, OP)) && (node->left->value.oper_number == EXP) && (CheckUnionType(node->right, NUM)))
+            else if ((CheckUnionType(node->left, OP))   &&
+                     (CheckUnionType(node->right, NUM)) &&
+                     (node->left->value.oper_number == EXP))
             {
                 node->value.number = exp(1) - node->right->value.number;
             }
 
-            else if ((CheckUnionType(node->right, OP)) && (node->right->value.oper_number == EXP) && (CheckUnionType(node->left, NUM)))
+            else if ((CheckUnionType(node->right, OP)) &&
+                     (CheckUnionType(node->left, NUM)) &&
+                     (node->right->value.oper_number == EXP))
             {
                 node->value.number = exp(1) - node->left->value.number;
             }
 
-            else if ((node->right->value.oper_number == EXP) && (CheckUnionType(node->right, OP)) && (node->left->value.oper_number == EXP) && (CheckUnionType(node->left, OP)))
+            else if ((node->right->value.oper_number == EXP) &&
+                     (node->left->value.oper_number == EXP)  &&
+                     (CheckUnionType(node->right, OP))       &&
+                     (CheckUnionType(node->left, OP)))
             {
                 node->value.number = 0;
             }
@@ -287,8 +320,6 @@ void DoNodeOperation(struct tree_t* tree,struct node_t* node)
 
         case DEG:
         {
-            TreeDump(node, SIMPLIFICATION);
-
             if ((CheckUnionType(node->left, NUM)) && (CheckUnionType(node->right, NUM)))
             {
                 if ((IsEqual(node->left->value.number, 0) && (IsEqual(node->right->value.number, 0))))

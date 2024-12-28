@@ -9,20 +9,28 @@
 
 node_t* DiffrAdd(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node    = Copy(node, tree);
+
     node_t* node_left    = Diffr(node->left, tree);
     node_t* node_right   = Diffr(node->right, tree);
 
     node_t* diffr_result = CreateNode(OP, value_t{.oper_number = ADD}, node_left, node_right, tree);
+
+    TreeDump(diffr_result, copy_node, DIFFERENTIATION);
 
     return diffr_result;
 }
 
 node_t* DiffrSub(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node    = Copy(node, tree);
+
     node_t* node_left    = Diffr(node->left, tree);
     node_t* node_right   = Diffr(node->right, tree);
 
     node_t* diffr_result = CreateNode(OP, value_t{.oper_number = SUB}, node_left, node_right, tree);
+
+    TreeDump(diffr_result, copy_node, DIFFERENTIATION);
 
     return diffr_result;
 }
@@ -33,6 +41,8 @@ node_t* DiffrMull(struct node_t* node, struct tree_t* tree)
     {
         return DiffrMullExp(node, tree);
     }
+
+    node_t* copy_node       = Copy(node, tree);
 
     node_t* diff_node_left  = Diffr(node->left, tree);
     node_t* diff_node_right = Diffr(node->right, tree);
@@ -45,12 +55,15 @@ node_t* DiffrMull(struct node_t* node, struct tree_t* tree)
 
     node_t* diffr_result    = CreateNode(OP, value_t{.oper_number = ADD}, first_summand, second_summand, tree);
 
+    TreeDump(diffr_result, copy_node, DIFFERENTIATION);
+
     return diffr_result;
 }
 
 node_t* DiffrDiv(struct node_t* node, struct tree_t* tree)
 {
     node_t* diff_node_left = NULL;
+    node_t* copy_node = Copy(node, tree);
 
     if (CheckUnionType(node->left, OP))
     {
@@ -78,13 +91,15 @@ node_t* DiffrDiv(struct node_t* node, struct tree_t* tree)
 
     node_t* diffr_result      = CreateNode(OP, value_t{.oper_number = DIV}, numerator, denominator, tree);
 
-    TreeDump(diffr_result, SIMPLIFICATION);
+    TreeDump(diffr_result, copy_node, DIFFERENTIATION);
 
     return diffr_result;
 }
 
 node_t* DiffrDeg(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node    = Copy(node, tree);
+
     if ((node->left->type == NUM) && (node->right->type == NUM))
     {
         return CreateNode(NUM, value_t{.number = 0}, NULL, NULL, tree);
@@ -105,6 +120,8 @@ node_t* DiffrDeg(struct node_t* node, struct tree_t* tree)
 
         node_t* diffr_result = CreateNode(OP, value_t{.oper_number = MULL}, coeff, new_var, tree);
 
+        TreeDump(diffr_result, copy_node, DIFFERENTIATION);
+
         return diffr_result;
     }
 
@@ -115,6 +132,8 @@ node_t* DiffrDeg(struct node_t* node, struct tree_t* tree)
         node_t* first_mull  = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node, tree), ln, tree);
 
         node_t* second_mull = CreateNode(OP, value_t{.oper_number = MULL}, first_mull, Diffr(node->right, tree), tree);
+
+        TreeDump(second_mull, copy_node, DIFFERENTIATION);
 
         return second_mull;
     }
@@ -136,6 +155,8 @@ node_t* DiffrDeg(struct node_t* node, struct tree_t* tree)
 
         node_t* node_mull      = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node, tree), dif_part, tree);
 
+        TreeDump(node_mull, copy_node, DIFFERENTIATION);
+
         return node_mull;
     }
 
@@ -149,15 +170,21 @@ node_t* DiffrDeg(struct node_t* node, struct tree_t* tree)
 
 node_t* DiffrSin(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node    = Copy(node, tree);
+
     node_t* node_cos  = CreateNode(OP, value_t{.oper_number = COS}, NULL, Copy(node->right, tree), tree);
 
     node_t* node_mull = CreateNode(OP, value_t{.oper_number = MULL}, node_cos, Diffr(node->right, tree), tree);
+
+    TreeDump(node_mull, copy_node, DIFFERENTIATION);
 
     return node_mull;
 }
 
 node_t* DiffrCos(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node = Copy(node, tree);
+
     node_t* node_sin  = CreateNode(OP, value_t{.oper_number = SIN}, NULL, Copy(node->right, tree), tree);
 
     node_t* coef      = CreateNode(NUM, value_t{.number = -1}, NULL, NULL, tree);
@@ -166,11 +193,15 @@ node_t* DiffrCos(struct node_t* node, struct tree_t* tree)
 
     node_t* node_mull = CreateNode(OP, value_t{.oper_number = MULL}, coef_sin, Diffr(node->right, tree), tree);
 
+    TreeDump(node_mull, copy_node, DIFFERENTIATION);
+
     return node_mull;
 }
 
 node_t* DiffrTan(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node   = Copy(node, tree);
+
     node_t* numerator   = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
 
     node_t* cos_node    = CreateNode(OP, value_t{.oper_number = COS}, NULL, Copy(node->right, tree), tree);
@@ -183,11 +214,15 @@ node_t* DiffrTan(struct node_t* node, struct tree_t* tree)
 
     node_t* node_mull   = CreateNode(OP, value_t{.oper_number  = MULL}, dif_tg, Diffr(node->right, tree), tree);
 
+    TreeDump(node_mull, copy_node, DIFFERENTIATION);
+
     return node_mull;
 }
 
 node_t* DiffrCot(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node   = Copy(node, tree);
+
     node_t* numerator   = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
 
     node_t* sin_node    = CreateNode(OP, value_t{.oper_number = SIN}, NULL, Copy(node->right, tree), tree);
@@ -204,6 +239,8 @@ node_t* DiffrCot(struct node_t* node, struct tree_t* tree)
 
     node_t* node_mull   = CreateNode(OP, value_t{.oper_number  = MULL}, coef_dif_tg, Diffr(node->right, tree), tree);
 
+    TreeDump(node_mull, copy_node, DIFFERENTIATION);
+
     return node_mull;
 }
 
@@ -211,27 +248,37 @@ node_t* DiffrCot(struct node_t* node, struct tree_t* tree)
 
 node_t* DiffrShx(struct node_t* node, struct tree_t* tree)
 {
-    node_t* node_ch  = CreateNode(OP, value_t{.oper_number = CHS}, NULL, Copy(node->right, tree), tree);
+    node_t* copy_node = Copy(node, tree);
+
+    node_t* node_ch   = CreateNode(OP, value_t{.oper_number = CHS}, NULL, Copy(node->right, tree), tree);
 
     node_t* node_mull = CreateNode(OP, value_t{.oper_number = MULL}, node_ch, Diffr(node->right, tree), tree);
+
+    TreeDump(node_mull, copy_node, DIFFERENTIATION);
 
     return node_mull;
 }
 
 node_t* DiffrChs(struct node_t* node, struct tree_t* tree)
 {
-    node_t* node_sh  = CreateNode(OP, value_t{.oper_number = SHX}, NULL, Copy(node->right, tree), tree);
+    node_t* copy_node = Copy(node, tree);
+
+    node_t* node_sh   = CreateNode(OP, value_t{.oper_number = SHX}, NULL, Copy(node->right, tree), tree);
 
     node_t* node_mull = CreateNode(OP, value_t{.oper_number = MULL}, node_sh, Diffr(node->right, tree), tree);
+
+    TreeDump(node_mull, copy_node, DIFFERENTIATION);
 
     return node_mull;
 }
 
 node_t* DiffrThx(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node   = Copy(node, tree);
+
     node_t* numerator   = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
 
-    node_t* ch_node    = CreateNode(OP, value_t{.oper_number = CHS}, NULL, Copy(node->right, tree), tree);
+    node_t* ch_node     = CreateNode(OP, value_t{.oper_number = CHS}, NULL, Copy(node->right, tree), tree);
 
     node_t* deg         = CreateNode(NUM, value_t{.number = 2}, NULL, NULL, tree);
 
@@ -241,26 +288,32 @@ node_t* DiffrThx(struct node_t* node, struct tree_t* tree)
 
     node_t* node_mull   = CreateNode(OP, value_t{.oper_number  = MULL}, dif_th, Diffr(node->right, tree), tree);
 
+    TreeDump(node_mull, copy_node, DIFFERENTIATION);
+
     return node_mull;
 }
 
 node_t* DiffrCth(struct node_t* node, struct tree_t* tree)
 {
-    node_t* numerator   = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
+    node_t* copy_node    = Copy(node, tree);
 
-    node_t* sh_node    = CreateNode(OP, value_t{.oper_number = SHX}, NULL, Copy(node->right, tree), tree);
+    node_t* numerator    = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
 
-    node_t* deg         = CreateNode(NUM, value_t{.number = 2}, NULL, NULL, tree);
+    node_t* sh_node      = CreateNode(OP, value_t{.oper_number = SHX}, NULL, Copy(node->right, tree), tree);
 
-    node_t* deg_op      = CreateNode(OP, value_t{.oper_number  = DEG}, sh_node, deg, tree);
+    node_t* deg          = CreateNode(NUM, value_t{.number = 2}, NULL, NULL, tree);
 
-    node_t* coef        = CreateNode(NUM, value_t{.number = -1}, NULL, NULL, tree);
+    node_t* deg_op       = CreateNode(OP, value_t{.oper_number  = DEG}, sh_node, deg, tree);
+
+    node_t* coef         = CreateNode(NUM, value_t{.number = -1}, NULL, NULL, tree);
 
     node_t* dif_cth      = CreateNode(OP, value_t{.oper_number  = DIV}, numerator, deg_op, tree);
 
     node_t* coef_dif_cth = CreateNode(OP, value_t{.oper_number = MULL}, coef, dif_cth, tree);
 
-    node_t* node_mull   = CreateNode(OP, value_t{.oper_number  = MULL}, coef_dif_cth, Diffr(node->right, tree), tree);
+    node_t* node_mull    = CreateNode(OP, value_t{.oper_number  = MULL}, coef_dif_cth, Diffr(node->right, tree), tree);
+
+    TreeDump(node_mull, copy_node, DIFFERENTIATION);
 
     return node_mull;
 }
@@ -269,20 +322,28 @@ node_t* DiffrCth(struct node_t* node, struct tree_t* tree)
 
 node_t* DiffrLn(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node = Copy(node, tree);
+
     node_t* coef_one  = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
 
     node_t* dif_ln    = CreateNode(OP, value_t{.oper_number = DIV}, coef_one, Copy(node->right, tree), tree);
 
     node_t* node_mull = CreateNode(OP, value_t{.oper_number = MULL}, dif_ln, Diffr(node->right, tree), tree);
 
+    TreeDump(node_mull, copy_node, DIFFERENTIATION);
+
     return node_mull;
 }
 
 node_t* DiffrDegExp(struct node_t* node, struct tree_t* tree)
 {
+    node_t* copy_node = Copy(node, tree);
+
     if ((node->right->type == OP) || (node->right->type == VAR))
     {
         node_t* node_mull = CreateNode(OP, value_t{.oper_number = MULL}, Copy(node, tree), Diffr(node->right, tree), tree);
+
+        TreeDump(node_mull, copy_node, DIFFERENTIATION);
 
         return node_mull;
     }

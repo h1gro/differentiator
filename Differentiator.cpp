@@ -90,20 +90,6 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
                 return DiffrCth(node, tree);
             }
 
-//             case LOG:
-//             {
-//                 node_t* coef_one    = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
-//
-//                 node_t* ln          = CreateNode(OP, value_t{.oper_number = LN}, NULL, Copy(node->left, tree);
-//
-//                 node_t* denominator = CreateNode(OP, value_t{.oper_number = MULL}, ln, Copy(node->right, tree), tree);
-//
-//                 node_t* dif_lg      = CreateNode(OP, value_t{.oper_number = DIV}, coef_one, denominator, tree);
-//
-//                 node_t* node_mull   = CreateNode(OP, value_t{.oper_number = MULL}, dif_lg, Diffr(node->right, tree), tree);
-//
-//                 return node_mull;
-//             }
             case LN:
             {
                 return DiffrLn(node, tree);
