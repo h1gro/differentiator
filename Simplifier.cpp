@@ -42,18 +42,18 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
         {
             case ADD:
             {
-                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(tree, node, node->left, node->right);TreeDump(node);return node;}
+                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(tree, node, node->left, node->right);TreeDump(node, SIMPLIFICATION);return node;}
 
-                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(tree, node, node->right, node->left);TreeDump(node);return node;}
+                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(tree, node, node->right, node->left);TreeDump(node, SIMPLIFICATION);return node;}
 
                 return node;
             }
 
             case SUB:
             {
-                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(tree, node, node->left, node->right);TreeDump(node);return node;}
+                if ((node->right->type == NUM) && (IsEqual(node->right->value.number, 0))){ChangeNodeAddSub(tree, node, node->left, node->right);TreeDump(node, SIMPLIFICATION);return node;}
 
-                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(tree, node, node->right, node->left);TreeDump(node);return node;}
+                if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0))){ChangeNodeAddSub(tree, node, node->right, node->left);TreeDump(node, SIMPLIFICATION);return node;}
 
                 return node;
             }
@@ -287,7 +287,7 @@ void DoNodeOperation(struct tree_t* tree,struct node_t* node)
 
         case DEG:
         {
-            TreeDump(node);
+            TreeDump(node, SIMPLIFICATION);
 
             if ((CheckUnionType(node->left, NUM)) && (CheckUnionType(node->right, NUM)))
             {

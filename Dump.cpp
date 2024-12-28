@@ -9,7 +9,7 @@ static FILE* tex_dump  = fopen("LaTeX/Dump_tex.tex", "w+");
 
 /*-------------------------Graph Dump--------------------------*/
 
-FILE* TreeDump(struct node_t* tree)
+FILE* TreeDump(struct node_t* tree, dump_calls command)
 {
     assert(tree);
 
@@ -49,7 +49,7 @@ FILE* TreeDump(struct node_t* tree)
         number_tex_dump = 1;
     }
 
-    LaTexDump(tree, tex_dump);
+    LaTexDump(tree, tex_dump, command);
 
     return tex_dump;
     //fprintf(tex_dump, "\\end{document}\n");
@@ -215,9 +215,37 @@ void PrintEdge(FILE* graph, struct node_t* node)
 //     dump->dump->html = fopen();
 // }
 
-void LaTexDump(struct node_t* node, FILE* dump)
+void LaTexDump(struct node_t* node, FILE* dump, dump_calls command)
 {
-    fprintf(dump, "\\section{Expression}\n\\begin{center}\n\t\\textit{$");
+    assert(node);
+    assert(dump);
+
+    static int number_simplification = 1;
+
+    switch(command)
+    {
+        case DEFAULT_EXPR:
+        {
+                              fprintf(dump, "\\section{Expression}\n\\begin{center}\n\t\\textit{$");
+                              break;
+        }
+
+        case DERIVATIVE:
+        {
+                              fprintf(dump, "\\section{Final Derivative}\n\\begin{center}\n\t\\textit{$");
+                              break;
+        }
+
+        case SIMPLIFICATION:
+        {
+                              number_simplification++;
+                              const char* sentense = GetSentense(number_simplification);
+                              fprintf(dump, "\\section{%s}\n\\begin{center}\n\t\\textit{$", sentense);
+                              break;
+        }
+
+        default:              printf("\nERROR IN COMMAND FOR LATEX DUMP\n");
+    }
 
     PrintExprInTex(node, dump);
 
@@ -320,7 +348,7 @@ void PrintExprInTex(struct node_t* node, FILE* dump)
 
         else if (strcmp(oper, "^") == 0)
         {
-            if (CheckUnionType(node->left, OP))
+            if ((CheckUnionType(node->left, OP)) && (node->left->value.oper_number != EXP))
             {
                 fprintf(dump, "{(");
 
@@ -376,4 +404,14 @@ void PrintExprInTex(struct node_t* node, FILE* dump)
     {
         fprintf(dump, " x ");
     }
+}
+
+const char* GetSentense(int num)
+{
+    if (num > NUM_SENTENCES)
+    {
+        num = num % NUM_SENTENCES;
+    }
+
+    return sentences[num - 1];
 }

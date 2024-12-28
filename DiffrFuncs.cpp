@@ -78,7 +78,7 @@ node_t* DiffrDiv(struct node_t* node, struct tree_t* tree)
 
     node_t* diffr_result      = CreateNode(OP, value_t{.oper_number = DIV}, numerator, denominator, tree);
 
-    TreeDump(diffr_result);
+    TreeDump(diffr_result, SIMPLIFICATION);
 
     return diffr_result;
 }
@@ -119,7 +119,7 @@ node_t* DiffrDeg(struct node_t* node, struct tree_t* tree)
         return second_mull;
     }
 
-    else if (((node->left->type == OP) && (node->right->type == OP)) || ((node->left->type == OP) && (node->right->type == VAR)) || ((node->left->type == VAR) && (node->right->type == VAR)))
+    else if (((node->left->type == OP) && (node->right->type == OP)) || ((node->left->type == OP) && (node->right->type == VAR)) || ((node->left->type == VAR) && (node->right->type == VAR)) || ((node->left->type == VAR) && (node->right->type == OP)))
     {
         if (node->left->value.oper_number == EXP)
         {
