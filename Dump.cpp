@@ -9,9 +9,10 @@ static FILE* tex_dump       = fopen("LaTeX/Dump_tex.tex", "w+");
 
 /*-------------------------Graph Dump--------------------------*/
 
-FILE* TreeDump(struct node_t* node, struct node_t* copy_node, dump_calls command)
+FILE* TreeDump(struct tree_t* tree, struct node_t* node, struct node_t* copy_node, dump_calls command)
 {
     assert(node);
+    assert(copy_node);
 
     FILE* dump_dot = fopen(DUMP_DOT, "w");
 
@@ -37,19 +38,12 @@ FILE* TreeDump(struct node_t* node, struct node_t* copy_node, dump_calls command
     static int number_tex_dump = 0;
     if (number_tex_dump == 0)
     {
-        fprintf(tex_dump, "\\documentclass[a4paper,12pt]{article}\n\\usepackage{cmap}\n\\usepackage[T2A]{fontenc}\n\\usepackage[utf8]{inputenc}\n"
-        "\\usepackage[english,russian]{babel}\n\\usepackage{graphicx}\n\\graphicspath{{noiseimages/}}\n"
-        "\\usepackage{enumitem}\n\\date{}\n\n\n\\newtheorem{task}{Задача}\n\\begin{document}\n\\begin{titlepage}\n"
-        "\\begin{center}\n\t\\textsc{MOSKOW INSTITUTE OF PHYSICS AND TECHNOLOGY}\n\t\\vspace{2ex}\n\n"
-        "\\end{center}\n\\vspace{10ex}\n\\begin{center}\n\t\\vspace{24ex}\n"
-        "\n\t\\vspace{2ex}\n\t\\textbf{\\Large{Differentiator}}\n\t\\vspace{34ex}\n"
-        "\t\\begin{flushright}\n\t\\noindent\n\tDone by:\n\t\\textit{Komarov Artem}\n\t\\end{flushright}\n\t\\vfill\n\tDolgoprudny, 2024\n"
-        "\\end{center}\n\\end{titlepage}\n\\newpage\n");
+        _WRITE_TEX_ARTICLE_();
 
         number_tex_dump = 1;
     }
 
-    LaTexDump(node, copy_node, tex_dump, command);
+    LaTexDump(tree, node, copy_node, tex_dump, command);
 
     return tex_dump;
 }
@@ -88,11 +82,12 @@ void PrintDefaultList(FILE* graph, struct node_t* node)
         case OP:
         {
                 const char* oper = WhatIsOperator(node->value.oper);
+
                 fprintf(graph, "    node%p [shape = Mrecord, style = filled, color = \"#006400\", fillcolor = \"#98FB98\", label = \"{ \'%s\' | type OP | { <f0> left %4p | <f1> right %4p}}\"];\n",
                                node, oper, node->left, node->right);
-                printf("node = %p, node->type = %d, node->value.oper_number = %d, node->value.oper = %c\n", node, node->type, node->value.oper_number, node->value.oper);
+
                 PrintEdge(graph, node);
-                printf("done\n");
+
                 break;
         }
 
@@ -171,60 +166,73 @@ void PrintEdge(FILE* graph, struct node_t* node)
     }
 }
 
-void LaTexDump(struct node_t* node, struct node_t* copy_node, FILE* dump, dump_calls command)
+void LaTexDump(struct tree_t* tree, struct node_t* node, struct node_t* copy_node, FILE* dump, dump_calls command)
 {
     assert(node);
     assert(dump);
 
     static int number_simplification = 1;
+    static int final_dif             = 0;
 
     switch(command)
     {
         case DEFAULT_EXPR:
         {
-                              fprintf(dump, "\\section{Expression}\n\\begin{center}\n\t\\textit{$");
+                              fprintf(dump, "\\section{Expression}\n\\begin{center}\n\t"
+                                            "\\text{In this simple example - function, that can solve my little brother\n\t"
+                                            "I'll show you how works my Differentiator.}\n\t\\vspace{2ex}\n\n\t\\textit{$");
 
-                              PrintExprInTex(node, dump);
+                              _WRITE_TEX_BRACKETS_(node, "f(x) = ", " ");
+
+                              tree->expression = node;
 
                               break;
         }
 
         case FINAL_DERIVATIVE:
         {
-                              fprintf(dump, "\\section{Final Derivative}\n\\begin{center}\n\t\\textit{$");
+                              fprintf(dump, "\\subsection{Final Derivative}\n\\begin{center}\n\t\\textit{$");
+
+                              _WRITE_TEX_BRACKETS_(tree->expression, "(", ")' = ");
+
+                              tree->derivative = node;
 
                               PrintExprInTex(node, dump);
+
+                              final_dif = 1;
 
                               break;
         }
 
         case SIMPLIFICATION:
         {
-                              number_simplification++;
                               const char* sentense = GetSentense(number_simplification);
-                              fprintf(dump, "\\section{%s}\n\\begin{center}\n\t\\textit{$", sentense);
+
+                              number_simplification++;
+
+                              fprintf(dump, "\\subsection{%s}\n\\begin{center}\n\t\\textit{$", sentense);
 
                               PrintExprInTex(copy_node, dump);
 
                               fprintf(dump, " = ");
 
                               PrintExprInTex(node, dump);
+
                               break;
         }
 
         case DIFFERENTIATION:
         {
-                              number_simplification++;
                               const char* sentense = GetSentense(number_simplification);
-                              fprintf(dump, "\\section{%s}\n\\begin{center}\n\t\\textit{$", sentense);
 
-                              fprintf(dump, "(");
+                              number_simplification++;
 
-                              PrintExprInTex(copy_node, dump);
+                              fprintf(dump, "\\subsection{%s}\n\\begin{center}\n\t\\textit{$", sentense);
 
-                              fprintf(dump, ")' = ");
+                              _WRITE_TEX_BRACKETS_(copy_node, "(", ")' = ");
 
                               PrintExprInTex(node, dump);
+
                               break;
         }
 
@@ -232,28 +240,35 @@ void LaTexDump(struct node_t* node, struct node_t* copy_node, FILE* dump, dump_c
     }
 
     fprintf(dump, "$}\n\\end{center}\n");
+
+    if (final_dif == 1)
+    {
+        fprintf(dump, "\\section{Result}\n\\begin{center}\n\t");
+
+        _WRITE_TEX_BRACKETS_(tree->expression, "\\textit{$f(x) = ", "$}\n\t\\vspace{6ex}");
+
+        fprintf(dump, "\n\n\t");
+
+        _WRITE_TEX_BRACKETS_(tree->derivative, "\\textit{$f'(x) = ", "$}\n\\end{center}\n");
+
+        fprintf(dump, "\\begin{center}\n\t\\vspace{12ex}\n\t\\textbf{\\Large{DERIVATIVE IS KILLED!!!}}\n\n\t"
+                "\\vspace{2ex}\n\t\\textbf{Thank you for your attention!}\n\n\t\\vspace{2ex}\n\t\\textbf{BOTAITE!}\n\\end{center}\n");
+    }
 }
 
 void PrintExprInTex(struct node_t* node, FILE* dump)
 {
-    assert(node);
     assert(dump);
 
     if (CheckUnionType(node, OP))
     {
         const char* oper = WhatIsOperator(node->value.oper);
 
-        if (strcmp(oper, "/") == 0) //TODO можно дефайн
+        if (strcmp(oper, "/") == 0)
         {
-            fprintf(dump, "\\frac {");
+            _WRITE_TEX_BRACKETS_(node->left, "\\frac {", "}");
 
-            PrintExprInTex(node->left, dump);
-
-            fprintf(dump, "} {");
-
-            PrintExprInTex(node->right, dump);
-
-            fprintf(dump, "} ");
+            _WRITE_TEX_BRACKETS_(node->right, "{", "} ");
         }
 
         else if ((strcmp(oper, "+") == 0) || (strcmp(oper, "-") == 0))
@@ -271,11 +286,7 @@ void PrintExprInTex(struct node_t* node, FILE* dump)
               || ((CheckUnionType(node->left, OP)) && ((node->left->value.oper_number == ADD)
                                                    || (node->left->value.oper_number == SUB))))
             {
-                fprintf(dump, "(");
-
-                PrintExprInTex(node->left, dump);
-
-                fprintf(dump, ")");
+                _WRITE_TEX_BRACKETS_(node->left, "(", ")");
             }
 
             else
@@ -289,11 +300,7 @@ void PrintExprInTex(struct node_t* node, FILE* dump)
               || ((CheckUnionType(node->right, OP)) && ((node->right->value.oper_number == ADD)
                                                    || (node->right->value.oper_number == SUB))))
             {
-                fprintf(dump, "(");
-
-                PrintExprInTex(node->right, dump);
-
-                fprintf(dump, ")");
+                _WRITE_TEX_BRACKETS_(node->right, "(", ")");
             }
 
             else
@@ -304,34 +311,26 @@ void PrintExprInTex(struct node_t* node, FILE* dump)
 
         else if (strcmp(oper, "^") == 0)
         {
-            if ((CheckUnionType(node->left, OP)) && (node->left->value.oper_number != EXP))
+            if ((CheckUnionType(node->left, OP)) && (node->left->value.oper_number != EXP) && (node->right->value.oper_number != DEG))
             {
-                fprintf(dump, "{(");
-
-                PrintExprInTex(node->left, dump);
-
-                fprintf(dump, ")}");
+                _WRITE_TEX_BRACKETS_(node->left, "(", ")");
             }
 
             else
             {
-                PrintExprInTex(node->left, dump);
+                _WRITE_TEX_BRACKETS_(node->left, "{", "}");
             }
 
             fprintf(dump, " %s ", oper);
 
-            if (CheckUnionType(node->right, OP))
+            if ((CheckUnionType(node->right, OP)) && (node->right->value.oper_number != EXP) && (node->right->value.oper_number != DEG) && (node->right->value.oper_number != DIV))
             {
-                fprintf(dump, "{(");
-
-                PrintExprInTex(node->right, dump);
-
-                fprintf(dump, ")}");
+                _WRITE_TEX_BRACKETS_(node->right, "{(", ")}");
             }
 
             else
             {
-                PrintExprInTex(node->right, dump);
+                _WRITE_TEX_BRACKETS_(node->right, "{", "}");
             }
         }
 

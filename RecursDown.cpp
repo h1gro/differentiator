@@ -15,7 +15,7 @@ node_t* GetDollar(struct expr_t* expr, struct tree_t* tree)
 
     node_t* val = GetAddSub(expr, tree);
 
-    if (expr->string[expr->index] != '$')
+    if (expr->string[expr->index] != '\0')
     {
         SyntaxError(__FILE__, __func__, __LINE__);
         expr->index++;

@@ -73,3 +73,15 @@ void FillingDataPoison(node_t** data, int num_el_poison)
         data[i] = 0;
     }
 }
+
+double RaiseToDegree(double number, double power)
+{
+    double number1 = 1;
+
+    for (int i = 1; i <= power; i++)
+    {
+        number1 *= number;
+    }
+
+    return number1;
+}

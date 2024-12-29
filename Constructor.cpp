@@ -18,27 +18,7 @@ node_t* CreateNode(types arg, union value_t value, node_t* left, node_t* right, 
     new_node->type  = arg;
 
     new_node->value = value;
-//     if (new_node->type == NUM)
-//     {
-//         new_node->value.number = value;
-//     }
-//
-//     else if (new_node->type == OP)
-//     {
-//         char oper = WhatIsOperator(int(value));
-//
-//         printf("oper = %c\n", oper);
-//
-//         new_node->value.oper        = oper;
-//         new_node->value.oper_number = int(value);
-//
-//         printf("node oper number = %d\n", new_node->value.oper_number);
-//     }
-//
-//     else if (new_node->type == VAR)
-//     {
-//         new_node->value.number = value;
-//     }
+
     root->addresses[root->number_nods] = new_node;
 
     root->number_nods++;
@@ -108,7 +88,7 @@ const char* WhatIsOperator(int value_oper)
         case LN :   return "ln";
 
         case EXP:   return "e";
-        
+
         default:    printf("ERROR TYPE\n");
                     return ERROR_TYPE;
     }

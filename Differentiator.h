@@ -88,6 +88,8 @@ struct tree_t
     int           number_nods;
     const char*   file;
     node_t*       first_node;
+    node_t*       expression;
+    node_t*       derivative;
     node_t**      addresses;
     int           array_addr_size;
     const func_t* ptr_on_keywords;
@@ -110,6 +112,21 @@ struct file_t
 const struct func_t keywords[NUM_FUNCS] = {{"sin", SIN}, {"cos", COS}, {"tg", TAN}, {"ctg", COT},
                                            {"sh",  SHX}, {"ch",  CHS}, {"th", THX}, {"cth", CTH},
                                            {"lg",  LOG}, {"ln",  LN }, {"e",  EXP}};
+
+#define _COUNT_FUNCTION_(func_name)                                \
+{                                                                  \
+    if (CheckUnionType(node->right, NUM))                          \
+    {                                                              \
+        node->value.number = func_name(node->right->value.number); \
+                                                                   \
+        node->type = NUM;                                          \
+                                                                   \
+        DeleteLocalNods(tree, node);                               \
+    }                                                              \
+                                                                   \
+    break;                                                         \
+}                                                                  \
+while(0)
 
 types WhatTypeIs           (char* value);
 

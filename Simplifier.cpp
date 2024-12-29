@@ -36,7 +36,7 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
                 {
                     ChangeNodeAddSub(tree, node, node->left, node->right);
 
-                    TreeDump(node, copy_node, SIMPLIFICATION);
+                    TreeDump(tree, node, copy_node, SIMPLIFICATION);
 
                     return node;
                 }
@@ -45,7 +45,7 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
                 {
                     ChangeNodeAddSub(tree, node, node->right, node->left);
 
-                    TreeDump(node, copy_node, SIMPLIFICATION);
+                    TreeDump(tree, node, copy_node, SIMPLIFICATION);
 
                     return node;
                 }
@@ -59,7 +59,7 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
                 {
                     ChangeNodeAddSub(tree, node, node->left, node->right);
 
-                    TreeDump(node, copy_node, SIMPLIFICATION);
+                    TreeDump(tree, node, copy_node, SIMPLIFICATION);
 
                     return node;
                 }
@@ -68,7 +68,7 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
                 {
                     ChangeNodeAddSub(tree, node, node->right, node->left);
 
-                    TreeDump(node, copy_node, SIMPLIFICATION);
+                    TreeDump(tree, node, copy_node, SIMPLIFICATION);
 
                     return node;
                 }
@@ -78,8 +78,6 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
 
             case MULL:
             {
-                //printf("node = %p\nnode->right = %p\nnode->left = %p\nnode->right->type = %d\nnode->left->type = %d\n", node, node->right, node->left, node->right->type, node->left->type);
-
                 if ((node->left->type == NUM)  && (IsEqual(node->left->value.number, 0)))
                 {
                     ChangeNodeMullDeg(tree, node, node->left);
@@ -138,6 +136,7 @@ node_t* Simplifier(struct node_t* node, struct tree_t* tree)
                     node->value.oper_number = MULL;
                     node->right->value.number = 1 / node->right->value.number;
                 }
+
                 return node;
             }
 
@@ -200,8 +199,6 @@ void DoNodeOperation(struct tree_t* tree, struct node_t* node)
     {
         return;
     }
-
-    printf("OPER NUMBER = %d\n", node->value.oper_number);
 
     switch(node->value.oper_number)
     {
@@ -342,44 +339,44 @@ void DoNodeOperation(struct tree_t* tree, struct node_t* node)
 
         case SIN:
         {
-            if (CheckUnionType(node->right, NUM))
-            {
-                node->value.number = sin(node->right->value.number);
-
-                node->type = NUM;
-
-                DeleteLocalNods(tree, node);
-            }
-
-            break;
+            _COUNT_FUNCTION_(sin);
         }
 
         case COS:
         {
-            if (CheckUnionType(node->right, NUM))
-            {
-                node->value.number = cos(node->right->value.number);
+            _COUNT_FUNCTION_(cos);
+        }
 
-                node->type = NUM;
+        case TAN:
+        {
+            _COUNT_FUNCTION_(tan);
+        }
 
-                DeleteLocalNods(tree, node);
-            }
+        case COT:
+        {
+            _COUNT_FUNCTION_(1/tan);
+        }
 
-            break;
+        case SHX:
+        {
+            _COUNT_FUNCTION_(sinh);
+        }
+
+        case CHS:
+        {
+            _COUNT_FUNCTION_(cosh);
+        }
+
+        case THX:
+        {
+            _COUNT_FUNCTION_(tanh);
+        }
+
+        case CTH:
+        {
+            _COUNT_FUNCTION_(1/tanh);
         }
 
         default:    printf("error in donodeoperation\n");
     }
-}
-
-double RaiseToDegree(double number, double power)
-{
-    double number1 = 1;
-
-    for (int i = 1; i <= power; i++)
-    {
-        number1 *= number;
-    }
-
-    return number1;
 }

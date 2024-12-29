@@ -13,12 +13,24 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
 
     if (node->type == NUM)
     {
-        return CreateNode(NUM, value_t{.number = 0}, NULL, NULL, tree);
+        node_t* copy_node = Copy(node, tree);
+
+        node_t* dif_node = CreateNode(NUM, value_t{.number = 0}, NULL, NULL, tree);
+
+        TreeDump(tree, dif_node, copy_node, DIFFERENTIATION);
+
+        return dif_node;
     }
 
     if (node->type == VAR)
     {
-        return CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
+        node_t* copy_node = Copy(node, tree);
+
+        node_t* dif_node = CreateNode(NUM, value_t{.number = 1}, NULL, NULL, tree);
+
+        TreeDump(tree, dif_node, copy_node, DIFFERENTIATION);
+
+        return dif_node;
     }
 
     if (node->type == OP)
@@ -103,7 +115,7 @@ node_t* Diffr(struct node_t* node, struct tree_t* tree)
             default: printf("ERROR IN DIFFERENTIATION\n");
         }
     }
-
+    printf("NULL\n");
     return NULL;
 }
 
