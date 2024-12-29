@@ -1,1 +1,0 @@
-ln((ln((sin((ln((tg(cos(1/x))^2)))^3))^(e^(ctg(1/x)))))/(10*ctg(ln(1/th(x))/(ln(ln(x))))+1))$
